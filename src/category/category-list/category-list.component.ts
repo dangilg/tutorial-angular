@@ -41,13 +41,10 @@ export class CategoryListComponent implements OnInit{
       );
     }
 
-    funEdit(id:number, name:string){
+    funEdit(category:Category){
 
       this.openEditCreateModal(
-        {category:
-          {id:id,
-            name:name
-          }
+        {category:category
           ,
           editMode:true
         }

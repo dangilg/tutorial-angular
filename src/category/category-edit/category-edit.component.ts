@@ -30,10 +30,12 @@ export class CategoryEditComponent implements OnInit {
     ) {}
 
     ngOnInit(): void {
-        this.category = this.data.category;
-        console.log(this.category)
+      //si existe this.data.category -> crear nuevo objeto con los datos del mismo
+      //sino, nuevo objeto vacío.
+        this.category = this.data.category ? {...this.data.category}:new Category();
+
         this.editMode =this.data.editMode;
-        console.log(this.editMode);
+
     }
 
     onSave() {
