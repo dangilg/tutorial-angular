@@ -57,3 +57,9 @@ Angular CLI does not come with an end-to-end testing framework by default. You c
 ## Additional Resources
 
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+
+
+## Modificaciones respecto al Tutorial
+
+En el modal de editarCategoria, a la hora de crear una nueva categoria, mantenemos el input de id como disable, pero en el placeholder indicamos el id que será
+(id de la última categoría + 1)
