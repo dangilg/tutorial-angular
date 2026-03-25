@@ -1,4 +1,6 @@
-import {Component } from '@angular/core';
+import { Component, Inject } from '@angular/core';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-dialog-confirmation',
@@ -6,4 +8,22 @@ import {Component } from '@angular/core';
   templateUrl: './dialog-confirmation.component.html',
   styleUrl:'./dialog-confirmation.component.scss'
 })
-export class DialogConfirmation { }
+export class DialogConfirmationComponent{
+
+  title: string;
+    description: string;
+
+    constructor(
+        public dialogRef: MatDialogRef<DialogConfirmationComponent>,
+        @Inject(MAT_DIALOG_DATA) public data: any
+    ) {}
+
+    ngOnInit(): void {
+        this.title = this.data.title;
+        this.description = this.data.description;
+    }
+
+    onClose(value = false) {
+        this.dialogRef.close(value);
+    }
+ }
