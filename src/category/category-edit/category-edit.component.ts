@@ -6,6 +6,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
+import { categoryEditDataModel } from '../models/category-edit-dataModel';
 
 @Component({
     selector: 'app-category-edit',
@@ -20,20 +21,18 @@ import { MatButtonModule } from '@angular/material/button';
     styleUrl: './category-edit.component.scss'
 })
 export class CategoryEditComponent implements OnInit {
-    category: Category =new Category();
-    editMode: boolean=false;
+    category: Category;
+    editMode: boolean;
     constructor(
         public dialogRef: MatDialogRef<CategoryEditComponent>,
         private categoryService: CategoryService,
-        @Inject(MAT_DIALOG_DATA) public data:any,
+        @Inject(MAT_DIALOG_DATA) public data:categoryEditDataModel,
     ) {}
 
     ngOnInit(): void {
-        //la inicializacion debemos hacerla antes por strict:true
-        //this.category = new Category();
-        this.category.id=this.data.id;
-        this.category.name =this.data.name;
-        this.editMode =this.data.edit;
+        this.category = this.data.category;
+        console.log(this.category)
+        this.editMode =this.data.editMode;
         console.log(this.editMode);
     }
 
