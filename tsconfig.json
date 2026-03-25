@@ -8,10 +8,16 @@
     "experimentalDecorators": true,
     "importHelpers": true,
     "target": "ES2022",
-    "module": "preserve"
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "useDefineForClassFields": false,
+    "strict": true,
+
   },
   "angularCompilerOptions": {
-    "enableI18nLegacyMessageIdFormat": false
+    "enableI18nLegacyMessageIdFormat": false,
+    "strictInjectionParameters": true,
+    "strictTemplates": true
   },
   "files": [],
   "references": [
