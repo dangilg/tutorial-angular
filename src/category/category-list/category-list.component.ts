@@ -67,7 +67,7 @@ export class CategoryListComponent implements OnInit {
               this.ngOnInit();
             },
             error: (err) => {
-              console.log(err)      
+              console.log(err)
             }
           }
         );
