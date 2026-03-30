@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild} from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { PageEvent } from '@angular/material/paginator';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { AuthorEditComponent } from '../author-edit/author-edit.component';
@@ -26,10 +26,17 @@ export class AuthorListComponent implements OnInit {
     dataSource = new MatTableDataSource<Author>();
     displayedColumns: string[] = ['id', 'name', 'nationality', 'action'];
 
+    @ViewChild(MatPaginator) paginator!:MatPaginator;
+
     constructor(private authorService: AuthorService, public dialog: MatDialog) {}
 
     ngOnInit(): void {
         this.loadPage();
+    }
+
+
+    ngAfterViewInit(): void {
+        this.dataSource.paginator = this.paginator;
     }
 
     loadPage(event?: PageEvent) {
