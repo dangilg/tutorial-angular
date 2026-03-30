@@ -39,6 +39,10 @@ export class CategoryEditComponent implements OnInit {
     }
 
     onSave() {
+        if(!this.editMode){
+          this.category.id=null;
+        }
+        console.log(this.category);
         this.categoryService.saveCategory(this.category).subscribe(() => {
             this.dialogRef.close();
         });
