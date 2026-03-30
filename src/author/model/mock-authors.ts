@@ -15,5 +15,5 @@ export const AUTHOR_DATA: AuthorPage = {
         pageNumber: 0,
         sort: [{ property: 'id', direction: 'ASC' }],
     },
-    totalElements: 7,
+    totalElements: 7
 };

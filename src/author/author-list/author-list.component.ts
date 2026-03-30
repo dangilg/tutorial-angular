@@ -11,6 +11,7 @@ import { DialogConfirmationComponent } from '../../core/dialog-confirmation/dial
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { AuthorEditDataModel } from '../model/authorEditDataModel';
 
 @Component({
     selector: 'app-author-list',
@@ -65,25 +66,37 @@ export class AuthorListComponent implements OnInit {
     }
 
     createAuthor() {
-        const dialogRef = this.dialog.open(AuthorEditComponent, {
-            data: {},
-        });
-
-        dialogRef.afterClosed().subscribe((result) => {
-            this.ngOnInit();
-        });
+        const id:number=this.totalElements+1;
+        this.openEditCreateModal(
+          {
+            author:{
+              id:id,
+              name:'',
+              nationality:''
+            },
+            editMode:false
+          }
+        )
     }
 
     editAuthor(author: Author) {
-        const dialogRef = this.dialog.open(AuthorEditComponent, {
-            data: { author: author },
+        this.openEditCreateModal(
+          {
+            author:author,
+            editMode:true
+          }
+        )
+    }
+
+    private openEditCreateModal(data:AuthorEditDataModel){
+      const dialogRef = this.dialog.open(AuthorEditComponent, {
+            data: data,
         });
 
         dialogRef.afterClosed().subscribe((result) => {
             this.ngOnInit();
         });
     }
-
     deleteAuthor(author: Author) {
         const dialogRef = this.dialog.open(DialogConfirmationComponent, {
             data: {
