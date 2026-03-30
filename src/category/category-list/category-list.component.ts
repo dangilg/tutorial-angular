@@ -12,81 +12,91 @@ import { categoryEditDataModel } from '../models/category-edit-dataModel';
 import { DialogConfirmationComponent } from '../../core/dialog-confirmation/dialog-confirmation.component';
 
 @Component({
-    selector: 'app-category-list',
-    imports: [
-        MatButtonModule,
-        MatIconModule,
-        MatTableModule,
-        CommonModule,
-    ],
-    templateUrl: './category-list.component.html',
-    styleUrl: './category-list.component.scss'
+  selector: 'app-category-list',
+  imports: [
+    MatButtonModule,
+    MatIconModule,
+    MatTableModule,
+    CommonModule,
+  ],
+  templateUrl: './category-list.component.html',
+  styleUrl: './category-list.component.scss'
 })
-export class CategoryListComponent implements OnInit{
+export class CategoryListComponent implements OnInit {
 
-    dataSource = new MatTableDataSource<Category>();
-    displayedColumns: string[] = ['id', 'name', 'action'];
-
-
-    constructor(
-      private categoryService: CategoryService,
-      public dialog:MatDialog,
-
-    ) {
-    }
-
-    ngOnInit(): void {
-      this.categoryService.getCategories().subscribe(
-        categories=>this.dataSource.data=categories
-      );
-    }
-
-    funEdit(category:Category){
-
-      this.openEditCreateModal(
-        {category:category
-          ,
-          editMode:true
-        }
-      )
-
-    }
+  dataSource = new MatTableDataSource<Category>();
+  displayedColumns: string[] = ['id', 'name', 'action'];
 
 
-    funDelete(category:Category){
-      const dialogRef = this.dialog.open(DialogConfirmationComponent, {
+  constructor(
+    private categoryService: CategoryService,
+    public dialog: MatDialog,
+
+  ) {
+  }
+
+  ngOnInit(): void {
+    this.categoryService.getCategories().subscribe(
+      categories => this.dataSource.data = categories
+    );
+  }
+
+  funEdit(category: Category) {
+
+    this.openEditCreateModal(
+      {
+        category: category
+        ,
+        editMode: true
+      }
+    )
+
+  }
+
+
+  funDelete(category: Category) {
+    const dialogRef = this.dialog.open(DialogConfirmationComponent, {
       data: { title: "Eliminar categoría", description: "Atención si borra la categoría se perderán sus datos.<br> ¿Desea eliminar la categoría?" }
     });
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.categoryService.deleteCategory(category.id).subscribe(result => {
-          this.ngOnInit();
-        });
+        this.categoryService.deleteCategory(category.id).subscribe(
+          {
+            next: () => {
+              this.ngOnInit();
+            },
+            error: (err) => {
+              console.log(err)      
+            }
+          }
+        );
       }
     });
-    }
+  }
 
-    createCategry(){
-      const id:number = this.dataSource.data[this.dataSource.data.length-1].id +1;
-      this.openEditCreateModal(
-        {category:
-          {id:id,
-            name:''
-          },
-          editMode:false
-        }
-      )
-    }
+  createCategry() {
+    const id: number = this.dataSource.data[this.dataSource.data.length - 1].id + 1;
+    this.openEditCreateModal(
+      {
+        category:
+        {
+          id: id,
+          name: ''
+        },
+        editMode: false
+      }
+    )
+  }
 
-    private openEditCreateModal(data:categoryEditDataModel){
+  private openEditCreateModal(data: categoryEditDataModel) {
 
-      const dialogRef = this.dialog.open(CategoryEditComponent, {
-        data:data
-      });
+    const dialogRef = this.dialog.open(CategoryEditComponent, {
+      data: data
+    });
 
-       dialogRef.afterClosed().subscribe(result=> {
-        this.ngOnInit();
-      });
-    }
+    dialogRef.afterClosed().subscribe(result => {
+      this.ngOnInit();
+    });
+  }
 }
