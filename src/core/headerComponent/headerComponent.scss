@@ -48,10 +48,37 @@
     }
 
     .header_login {
+      display: flex;
       font-size: 16px;
       cursor: pointer;
+      gap: 16px;
       .mat-icon {
           vertical-align: sub;
       }
+
+
+      .header_button {
+            margin-left: 1em;
+            margin-right: 1em;
+            font-size: 16px;
+
+            a {
+              font-weight: lighter;
+              text-decoration: none;
+              cursor: pointer;
+              color: white;
+            }
+
+            a:hover {
+              color: grey;
+            }
+
+            a.active {
+              font-weight: normal;
+              text-decoration: underline;
+              color: lightyellow;
+            }
+
+        }
   }
 }
