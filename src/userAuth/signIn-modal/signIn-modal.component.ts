@@ -1,5 +1,5 @@
-import { ChangeDetectionStrategy, Component, OnInit} from '@angular/core';
-import { MatFormField, MatLabel } from "@angular/material/form-field";
+import { Component, OnInit} from '@angular/core';
+import { MatFormField, MatLabel} from "@angular/material/form-field";
 import { MatInput } from "@angular/material/input";
 import { MatButtonModule } from '@angular/material/button';
 import { User } from '../model/User';
@@ -17,16 +17,17 @@ import { MatDialogRef } from '@angular/material/dialog';
     FormsModule,
     ReactiveFormsModule,
     MatButtonModule,
-    ],
+],
   templateUrl: './signIn-modal.component.html',
   styleUrl:'./signIn-modal.component.scss',
 })
 export class SignInModalComponent implements OnInit{
   user:User;
+  hidePassword:boolean =true;
 
   constructor(
         public dialogRef: MatDialogRef<SignInModalComponent>,
-        //private signInService: SignInService,
+        private signInService: SignInService,
 
     ) {}
 
@@ -34,4 +35,12 @@ export class SignInModalComponent implements OnInit{
 
     this.user = new User();
    }
+
+   onClose() {
+        this.dialogRef.close();
+    }
+
+    signIn(){
+      this.signInService.sigIn(this.user);
+    }
  }

@@ -1,0 +1,19 @@
+<div class="container">
+  <h1>Registrarse</h1>
+
+  <form>
+    <mat-form-field>
+      <mat-label>Usuario</mat-label>
+      <input type="text" matInput placeholder="Usuario" [(ngModel)]="user.username" name="username" required autocomplete="off">
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Contraseña</mat-label>
+        <input [type]="hidePassword?'password': 'text'" matInput placeholder="Contraseña" [(ngModel)]="user.password" name="pasword" required autocomplete="new-password">
+    </mat-form-field>
+  </form>
+
+  <div class="buttons">
+    <button mat-stroked-button (click)="onClose()">Cerrar</button>
+    <button mat-flat-button color="primary" (click)="signIn()">Registrarse</button>
+  </div>
+</div>
