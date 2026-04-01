@@ -5,7 +5,7 @@ import { RouterModule } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatDialog } from '@angular/material/dialog';
-import { SignInModalComponent } from '../../user/signIn-modal/signIn-modal.component';
+import { SignInModalComponent } from '../../userAuth/signIn-modal/signIn-modal.component';
 
 
 @Component({
