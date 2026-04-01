@@ -16,7 +16,8 @@ import { categoryEditDataModel } from '../models/category-edit-dataModel';
       ReactiveFormsModule,
       MatFormFieldModule,
       MatInputModule,
-      MatButtonModule ],
+      MatButtonModule
+    ],
     templateUrl: './category-edit.component.html',
     styleUrl: './category-edit.component.scss'
 })

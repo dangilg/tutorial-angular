@@ -100,6 +100,6 @@ export class CategoryListComponent implements OnInit {
     });
   }
   logged():boolean{
-    return false;
+    return true;
   }
 }
