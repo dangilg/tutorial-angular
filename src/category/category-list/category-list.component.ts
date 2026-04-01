@@ -99,4 +99,7 @@ export class CategoryListComponent implements OnInit {
       this.ngOnInit();
     });
   }
+  logged():boolean{
+    return false;
+  }
 }

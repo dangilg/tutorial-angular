@@ -19,21 +19,33 @@
                 </div>
             </div>
 
+            @if(logged()){
+              <div class="header_login">
+                <div class="header_button">
+                  <mat-icon>logout</mat-icon>
+                    <a (click)="openLogOutDialog()" routerLinkActive="active">
+                      Log Out
+                    </a>
+                </div>
+              </div>
+            }
+            @else{
             <div class="header_login">
                 <div class="header_button">
                   <mat-icon>account_circle</mat-icon>
                   <!-- Hay q cambiar las rutas para q yambien se aplique el cambio de css-->
-                  <a routerLink="/" routerLinkActive="active">
+                  <a (click)="openSignInModal()" routerLinkActive="active">
                     Sign in
                   </a>
                 </div>
                 <div class="header_button">
                   <mat-icon>login</mat-icon>
-                  <a routerLink="/" routerLinkActive="active">
+                  <a (click)="openLogInModal()" routerLinkActive="active">
                     Log in
                   </a>
                 </div>
             </div>
+          }
         </div>
     </mat-toolbar-row>
 </mat-toolbar>

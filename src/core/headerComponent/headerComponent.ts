@@ -4,6 +4,8 @@ import { Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatDialog } from '@angular/material/dialog';
+import { SignInModalComponent } from '../../user/signIn-modal/signIn-modal.component';
 
 
 @Component({
@@ -19,4 +21,24 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 })
 export class HeaderComponent {
   title = 'tutorial Angular';
+  constructor(
+    public dialog:MatDialog
+  ){
+
+  }
+
+  openSignInModal(){
+    const dialogRef = this.dialog.open(SignInModalComponent);
+  }
+
+  openLogInModal(){
+
+  }
+
+  openLogOutDialog(){
+
+  }
+  logged():boolean{
+    return false;
+  }
 }
