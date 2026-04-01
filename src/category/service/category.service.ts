@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { Observable, } from 'rxjs';
 import { Category } from '../models/category';
 import { CATEGORY_DATA } from '../models/mock-categories';
 @Injectable({
@@ -23,7 +23,7 @@ export class CategoryService {
 
   //<any> debería er <Category>
    saveCategory(category: Category): Observable<Category> {
-    console.log(category);
+
     const {id} =category;
     const url = id? `${this.baseUrl}/${id}`:this.baseUrl;
     return this.http.put<Category>(url,category);
