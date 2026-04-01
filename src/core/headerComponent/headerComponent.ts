@@ -28,7 +28,9 @@ export class HeaderComponent {
   }
 
   openSignInModal(){
-    const dialogRef = this.dialog.open(SignInModalComponent);
+    const dialogRef = this.dialog.open(SignInModalComponent,{
+      disableClose:true,
+    });
   }
 
   openLogInModal(){
