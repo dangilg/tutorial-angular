@@ -12,6 +12,7 @@ import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { AuthorEditDataModel } from '../model/authorEditDataModel';
+import { AuthService } from '../../core/service/auth.service';
 
 @Component({
     selector: 'app-author-list',
@@ -27,9 +28,16 @@ export class AuthorListComponent implements OnInit {
     dataSource = new MatTableDataSource<Author>();
     displayedColumns: string[] = ['id', 'name', 'nationality', 'action'];
 
+    isLoggedIn$ = this.authService.isLoggedIn$;
+
     @ViewChild(MatPaginator) paginator!:MatPaginator;
 
-    constructor(private authorService: AuthorService, public dialog: MatDialog) {}
+
+
+    constructor(
+      private authorService: AuthorService, public dialog: MatDialog,
+      private authService:AuthService
+    ) {}
 
     ngOnInit(): void {
         this.loadPage();

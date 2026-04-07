@@ -1,0 +1,39 @@
+<div class="container">
+  @switch(mode){
+    @case (AuthMode.LOGIN) {
+      <h1>Iniciar Sesión</h1>
+    }
+    @case (AuthMode.SIGNIN) {
+      <h1>Registrarse</h1>
+    }
+  }
+
+
+  <form >
+    <mat-form-field>
+      <mat-label>Usuario</mat-label>
+      <input type="text" matInput placeholder="Usuario" [(ngModel)]="user.username" name="username" required autocomplete="off" (click)="errorVisibility=false">
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Contraseña</mat-label>
+        <input [type]="hidePassword?'password': 'text'" matInput placeholder="Contraseña" [(ngModel)]="user.password" name="password" required autocomplete="new-password">
+    </mat-form-field>
+    <div class="errors">
+      @if(errorVisibility){
+        <p>{{errorMessage}}</p>
+      }
+    </div>
+    <div class="buttons">
+      <button mat-stroked-button type="button" (click)="onClose()">Cerrar</button>@switch(mode){
+    @case (AuthMode.LOGIN) {
+      <button mat-flat-button color="primary" type="button" (click)="logIn()">Iniciar Sesión</button>
+    }
+    @case (AuthMode.SIGNIN) {
+      <button mat-flat-button color="primary" type="button" (click)="signIn()">Registrarse</button>
+    }
+  }
+
+    </div>
+  </form>
+
+</div>

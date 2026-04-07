@@ -19,11 +19,11 @@
                 </div>
             </div>
 
-            @if(logged()){
+            @if(isLoggedIn$|async){
               <div class="header_login">
                 <div class="header_button">
                   <mat-icon>logout</mat-icon>
-                    <a (click)="openLogOutDialog()" routerLinkActive="active">
+                    <a (click)="logOut()" routerLinkActive="active">
                       Log Out
                     </a>
                 </div>

@@ -20,12 +20,14 @@
         <ng-container matColumnDef="action">
             <mat-header-cell *matHeaderCellDef></mat-header-cell>
             <mat-cell *matCellDef="let element">
+              @if(isLoggedIn$|async){
                 <button mat-icon-button color="primary" (click)="editAuthor(element)">
                     <mat-icon>edit</mat-icon>
                 </button>
                 <button mat-icon-button color="accent" (click)="deleteAuthor(element)">
                     <mat-icon>clear</mat-icon>
                 </button>
+              }
             </mat-cell>
         </ng-container>
 
@@ -35,7 +37,9 @@
 
     <mat-paginator (page)="loadPage($event)" [pageSizeOptions]="[5, 10, 20]" [pageIndex]="pageNumber" [pageSize]="pageSize" [length]="totalElements" showFirstLastButtons></mat-paginator>
 
+    @if(isLoggedIn$|async){
     <div class="buttons">
         <button mat-flat-button color="primary" (click)="createAuthor()">Nuevo autor</button>
     </div>
+  }
 </div>

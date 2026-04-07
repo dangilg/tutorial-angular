@@ -10,6 +10,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { CategoryEditComponent } from '../category-edit/category-edit.component';
 import { categoryEditDataModel } from '../models/category-edit-dataModel';
 import { DialogConfirmationComponent } from '../../core/dialog-confirmation/dialog-confirmation.component';
+import { AuthService } from '../../core/service/auth.service';
 
 @Component({
   selector: 'app-category-list',
@@ -27,10 +28,12 @@ export class CategoryListComponent implements OnInit {
   dataSource = new MatTableDataSource<Category>();
   displayedColumns: string[] = ['id', 'name', 'action'];
 
+  isLoggedIn$ = this.authService.isLoggedIn$;
 
   constructor(
     private categoryService: CategoryService,
     public dialog: MatDialog,
+    private authService:AuthService,
 
   ) {
   }
@@ -98,8 +101,5 @@ export class CategoryListComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       this.ngOnInit();
     });
-  }
-  logged():boolean{
-    return true;
   }
 }
