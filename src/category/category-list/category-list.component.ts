@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
-import { Category } from '../models/category';
+import { Category } from '../model/category';
 import { CommonModule } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
 import { MatIconModule } from '@angular/material/icon';
@@ -8,7 +8,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { CategoryService } from '../service/category.service';
 import { MatDialog } from '@angular/material/dialog';
 import { CategoryEditComponent } from '../category-edit/category-edit.component';
-import { categoryEditDataModel } from '../models/category-edit-dataModel';
+import { categoryEditDataModel } from '../model/category-edit-dataModel';
 import { DialogConfirmationComponent } from '../../core/dialog-confirmation/dialog-confirmation.component';
 import { AuthService } from '../../core/service/auth.service';
 

@@ -1,12 +1,12 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { CategoryService } from '../service/category.service';
-import { Category } from '../models/category';
+import { Category } from '../model/category';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
-import { categoryEditDataModel } from '../models/category-edit-dataModel';
+import { categoryEditDataModel } from '../model/category-edit-dataModel';
 
 @Component({
     selector: 'app-category-edit',
