@@ -14,6 +14,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { AuthorEditDataModel } from '../model/authorEditDataModel';
 import { AuthService } from '../../core/service/auth.service';
 
+
 @Component({
     selector: 'app-author-list',
     imports: [MatButtonModule, MatIconModule, MatTableModule, CommonModule, MatPaginatorModule],
@@ -35,7 +36,8 @@ export class AuthorListComponent implements OnInit {
 
 
     constructor(
-      private authorService: AuthorService, public dialog: MatDialog,
+      private authorService: AuthorService,
+      public dialog: MatDialog,
       private authService:AuthService
     ) {}
 
@@ -44,11 +46,8 @@ export class AuthorListComponent implements OnInit {
     }
 
 
-    ngAfterViewInit(): void {
-        this.dataSource.paginator = this.paginator;
-    }
-
     loadPage(event?: PageEvent) {
+
         const pageable: Pageable = {
             pageNumber: this.pageNumber,
             pageSize: this.pageSize,
@@ -66,10 +65,12 @@ export class AuthorListComponent implements OnInit {
         }
 
         this.authorService.getAuthors(pageable).subscribe((data) => {
+
             this.dataSource.data = data.content;
             this.pageNumber = data.pageable.pageNumber;
             this.pageSize = data.pageable.pageSize;
             this.totalElements = data.totalElements;
+
         });
     }
 
