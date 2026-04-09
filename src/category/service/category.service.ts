@@ -21,7 +21,6 @@ export class CategoryService {
   }
 
 
-  //<any> debería er <Category>
    saveCategory(category: Category): Observable<Category> {
 
     const {id} =category;

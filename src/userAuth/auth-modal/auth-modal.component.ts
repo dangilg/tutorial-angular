@@ -83,12 +83,14 @@ export class AuthModalComponent implements OnInit {
     this.authModalService.logIn(this.user).subscribe(
       {
         next:(response)=>{
+
             this.errorVisibility=false;
 
             this.authService.login(response.token);
             this.dialogRef.close();
         },
         error:(err)=>{
+
           if(err.status===401){
             this.errorMessage = "Wrong User or Password";
             this.errorVisibility = true;

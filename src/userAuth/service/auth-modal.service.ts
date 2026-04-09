@@ -17,7 +17,7 @@ export class AuthModalService{
   ) { }
 
   private baseUrl = 'http://localhost:8080/auth';
-  private signInUrl ='/sigIn';
+  private signInUrl ='/signIn';
   private logInUrl ='/logIn';
 
   sigIn(user:User):Observable<AuthResponse>{
