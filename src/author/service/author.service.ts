@@ -30,6 +30,6 @@ export class AuthorService {
     }
 
     getAllAuthors(): Observable<Author[]> {
-        return of(AUTHOR_DATA_LIST);
+        return this.http.get<Author[]>(this.baseUrl);
     }
 }
