@@ -21,7 +21,7 @@ export class GameService {
     saveGame(game: Game): Observable<void> {
         const { id } = game;
         const url = id ? `${this.baseUrl}/${id}` : this.baseUrl;
-
+        console.log()
         return this.http.put<void>(url, game);
     }
 

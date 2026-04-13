@@ -12,6 +12,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 
+
 @Component({
   selector: 'app-game-edit',
   imports: [
@@ -19,61 +20,75 @@ import { MatSelectModule } from '@angular/material/select';
     ReactiveFormsModule,
     MatFormFieldModule,
     MatInputModule, MatButtonModule,
-     MatSelectModule
-    ],
+    MatSelectModule
+  ],
   templateUrl: './game-edit.component.html',
-  styleUrl:'./game-edit.component.scss',
+  styleUrl: './game-edit.component.scss',
 })
 export class GameEditComponent implements OnInit {
-    game: Game;
-    authors: Author[];
-    categories: Category[];
+  game: Game;
+  authors: Author[];
+  categories: Category[];
+  gameId:number;
 
-    constructor(
-        public dialogRef: MatDialogRef<GameEditComponent>,
-        @Inject(MAT_DIALOG_DATA) public data: any,
-        private gameService: GameService,
-        private categoryService: CategoryService,
-        private authorService: AuthorService
-    ) {}
 
-    ngOnInit(): void {
-        this.game = this.data.game ? Object.assign({}, this.data.game) : new Game();
+  constructor(
+    public dialogRef: MatDialogRef<GameEditComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: any,
+    private gameService: GameService,
+    private categoryService: CategoryService,
+    private authorService: AuthorService
+  ) { }
 
-        this.categoryService.getCategories().subscribe((categories) => {
-            this.categories = categories;
+  ngOnInit(): void {
 
-            if (this.game.category != null) {
-                const categoryFilter: Category[] = categories.filter(
-                    (category) => category.id == this.data.game.category.id
-                );
-                if (categoryFilter != null) {
-                    this.game.category = categoryFilter[0];
-                }
-            }
-        });
-
-        this.authorService.getAllAuthors().subscribe((authors) => {
-            this.authors = authors;
-
-            if (this.game.author != null) {
-                const authorFilter: Author[] = authors.filter(
-                    (author) => author.id == this.data.game.author.id
-                );
-                if (authorFilter != null) {
-                    this.game.author = authorFilter[0];
-                }
-            }
-        });
+    if (this.data.game) {
+      this.game = this.data.game;
+      this.gameId=this.game.id;
+    }
+    else {
+      this.game = new Game();
+      this.gameId = this.data.newId;
     }
 
-    onSave() {
-        this.gameService.saveGame(this.game).subscribe((result) => {
-            this.dialogRef.close();
-        });
-    }
+    //this.game = this.data.game ? Object.assign({}, this.data.game) : new Game();
+    console.log("game-edit.component // ngOnInit // game");
+    console.log(this.game);
+    this.categoryService.getCategories().subscribe((categories) => {
+      this.categories = categories;
 
-    onClose() {
-        this.dialogRef.close();
-    }
+      if (this.game.category != null) {
+        const categoryFilter: Category[] = categories.filter(
+          (category) => category.id == this.data.game.category.id
+        );
+        if (categoryFilter != null) {
+          this.game.category = categoryFilter[0];
+        }
+      }
+    });
+
+    this.authorService.getAllAuthors().subscribe((authors) => {
+      this.authors = authors;
+
+      if (this.game.author != null) {
+        const authorFilter: Author[] = authors.filter(
+          (author) => author.id == this.data.game.author.id
+        );
+        if (authorFilter != null) {
+          this.game.author = authorFilter[0];
+        }
+      }
+    });
+  }
+
+  onSave() {
+    console.log(this.game);
+    this.gameService.saveGame(this.game).subscribe((result) => {
+      this.dialogRef.close();
+    });
+  }
+
+  onClose() {
+    this.dialogRef.close();
+  }
 }
