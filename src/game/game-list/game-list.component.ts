@@ -15,6 +15,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { GameItemComponent } from './game-item/game-item.component';
 import { AuthService } from '../../core/service/auth.service';
+import { editCreateDataModel } from '../../core/model/editCreateDataModel';
+
 
 @Component({
   selector: 'app-game-list',
@@ -82,11 +84,23 @@ export class GameListComponent implements OnInit {
 
   }
 
-  createGame() {
 
-    const dialogRef = this.dialog.open(GameEditComponent, {
-      data: {newId: this.nextGameId},
+  private openEditCreateModal(data: editCreateDataModel<Game>){
+  const dialogRef = this.dialog.open(GameEditComponent, {
+      data: data,
     });
+    return dialogRef;
+  }
+
+  createGame() {
+    let game = new Game();
+    game.id=this.nextGameId;
+    const dialogRef = this.openEditCreateModal(
+      {
+        object:game,
+        editMode:false
+      }
+    );
 
     dialogRef.afterClosed().subscribe((result) => {
       this.ngOnInit();
@@ -94,9 +108,13 @@ export class GameListComponent implements OnInit {
   }
 
   editGame(game: Game) {
-    const dialogRef = this.dialog.open(GameEditComponent, {
-      data: { game: game },
-    });
+    console.log(game);
+    const dialogRef = this.openEditCreateModal(
+      {
+        object:game,
+        editMode:true
+      }
+    );
 
     dialogRef.afterClosed().subscribe((result) => {
       this.onSearch();

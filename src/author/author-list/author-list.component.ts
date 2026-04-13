@@ -11,8 +11,9 @@ import { DialogConfirmationComponent } from '../../core/dialog-confirmation/dial
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { AuthorEditDataModel } from '../model/authorEditDataModel';
+
 import { AuthService } from '../../core/service/auth.service';
+import { editCreateDataModel } from '../../core/model/editCreateDataModel';
 
 
 @Component({
@@ -78,7 +79,7 @@ export class AuthorListComponent implements OnInit {
         const id:number=this.totalElements+1;
         this.openEditCreateModal(
           {
-            author:{
+            object:{
               id:id,
               name:'',
               nationality:''
@@ -91,13 +92,13 @@ export class AuthorListComponent implements OnInit {
     editAuthor(author: Author) {
         this.openEditCreateModal(
           {
-            author:author,
+            object:author,
             editMode:true
           }
         )
     }
 
-    private openEditCreateModal(data:AuthorEditDataModel){
+    private openEditCreateModal(data:editCreateDataModel<Author>){
       const dialogRef = this.dialog.open(AuthorEditComponent, {
             data: data,
         });

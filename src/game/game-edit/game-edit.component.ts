@@ -11,6 +11,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
+import { editCreateDataModel } from '../../core/model/editCreateDataModel';
 
 
 @Component({
@@ -29,37 +30,30 @@ export class GameEditComponent implements OnInit {
   game: Game;
   authors: Author[];
   categories: Category[];
-  gameId:number;
+
+
+  editMode:boolean;
 
 
   constructor(
     public dialogRef: MatDialogRef<GameEditComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: any,
+    @Inject(MAT_DIALOG_DATA) public data: editCreateDataModel<Game>,
     private gameService: GameService,
     private categoryService: CategoryService,
     private authorService: AuthorService
   ) { }
 
   ngOnInit(): void {
-
-    if (this.data.game) {
-      this.game = this.data.game;
-      this.gameId=this.game.id;
-    }
-    else {
-      this.game = new Game();
-      this.gameId = this.data.newId;
-    }
-
+    this.game = this.data.object;
+    this.editMode=this.data.editMode;
     //this.game = this.data.game ? Object.assign({}, this.data.game) : new Game();
-    console.log("game-edit.component // ngOnInit // game");
-    console.log(this.game);
+
     this.categoryService.getCategories().subscribe((categories) => {
       this.categories = categories;
 
       if (this.game.category != null) {
         const categoryFilter: Category[] = categories.filter(
-          (category) => category.id == this.data.game.category.id
+          (category) => category.id == this.game.category.id
         );
         if (categoryFilter != null) {
           this.game.category = categoryFilter[0];
@@ -72,7 +66,7 @@ export class GameEditComponent implements OnInit {
 
       if (this.game.author != null) {
         const authorFilter: Author[] = authors.filter(
-          (author) => author.id == this.data.game.author.id
+          (author) => author.id == this.game.author.id
         );
         if (authorFilter != null) {
           this.game.author = authorFilter[0];

@@ -8,7 +8,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { CategoryService } from '../service/category.service';
 import { MatDialog } from '@angular/material/dialog';
 import { CategoryEditComponent } from '../category-edit/category-edit.component';
-import { categoryEditDataModel } from '../model/category-edit-dataModel';
+import { editCreateDataModel } from '../../core/model/editCreateDataModel';
 import { DialogConfirmationComponent } from '../../core/dialog-confirmation/dialog-confirmation.component';
 import { AuthService } from '../../core/service/auth.service';
 
@@ -48,7 +48,7 @@ export class CategoryListComponent implements OnInit {
 
     this.openEditCreateModal(
       {
-        category: category
+        object: category
         ,
         editMode: true
       }
@@ -82,7 +82,7 @@ export class CategoryListComponent implements OnInit {
     const id: number = this.dataSource.data[this.dataSource.data.length - 1].id + 1;
     this.openEditCreateModal(
       {
-        category:
+        object:
         {
           id: id,
           name: ''
@@ -92,7 +92,7 @@ export class CategoryListComponent implements OnInit {
     )
   }
 
-  private openEditCreateModal(data: categoryEditDataModel) {
+  private openEditCreateModal(data: editCreateDataModel<Category>) {
 
     const dialogRef = this.dialog.open(CategoryEditComponent, {
       data: data

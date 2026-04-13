@@ -6,7 +6,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
-import { categoryEditDataModel } from '../model/category-edit-dataModel';
+import { editCreateDataModel } from '../../core/model/editCreateDataModel';
 
 @Component({
     selector: 'app-category-edit',
@@ -27,13 +27,13 @@ export class CategoryEditComponent implements OnInit {
     constructor(
         public dialogRef: MatDialogRef<CategoryEditComponent>,
         private categoryService: CategoryService,
-        @Inject(MAT_DIALOG_DATA) public data:categoryEditDataModel,
+        @Inject(MAT_DIALOG_DATA) public data:editCreateDataModel<Category>,
     ) {}
 
     ngOnInit(): void {
       //si existe this.data.category -> crear nuevo objeto con los datos del mismo
       //sino, nuevo objeto vacío.
-        this.category = this.data.category ? {...this.data.category}:new Category();
+        this.category = this.data.object ? {...this.data.object}:new Category();
 
         this.editMode =this.data.editMode;
 

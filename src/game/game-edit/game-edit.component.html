@@ -1,5 +1,5 @@
 <div class="container">
-    @if (game.id) {
+    @if (editMode) {
         <h1>Modificar juego</h1>
     } @else {
         <h1>Crear juego</h1>
@@ -8,7 +8,7 @@
     <form>
         <mat-form-field>
             <mat-label>Identificador</mat-label>
-            <input type="text" matInput placeholder="Identificador" [(ngModel)]="gameId" name="id" disabled>
+            <input type="text" matInput placeholder="Identificador" [(ngModel)]="game.id" name="id" disabled>
         </mat-form-field>
 
         <mat-form-field>

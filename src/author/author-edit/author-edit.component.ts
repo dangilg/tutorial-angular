@@ -6,6 +6,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { editCreateDataModel } from '../../core/model/editCreateDataModel';
 
 @Component({
     selector: 'app-author-edit',
@@ -24,12 +25,12 @@ export class AuthorEditComponent implements OnInit {
 
     constructor(
         public dialogRef: MatDialogRef<AuthorEditComponent>,
-        @Inject(MAT_DIALOG_DATA) public data: any,
+        @Inject(MAT_DIALOG_DATA) public data: editCreateDataModel<Author>,
         private authorService: AuthorService
     ) {}
 
     ngOnInit(): void {
-        this.author = this.data.author ? Object.assign({}, this.data.author) : new Author();
+        this.author = this.data.object ? Object.assign({}, this.data.object) : new Author();
 
         this.editMode = this.data.editMode;
     }
