@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, } from 'rxjs';
 import { Category } from '../model/category';
@@ -18,6 +18,11 @@ export class CategoryService {
   private baseUrl = 'http://localhost:8080/category';
   private token = this.auth.getToken();
 
+  private headers = new HttpHeaders({
+    Authorization: `Bearer ${this.token}`
+  });
+
+
   getCategories(): Observable<Category[]> {
     //return of(CATEGORY_DATA);
     return this.http.get<Category[]>(this.baseUrl);
@@ -28,15 +33,17 @@ export class CategoryService {
    saveCategory(category: Category): Observable<Category> {
     const {id} =category;
     const url = id? `${this.baseUrl}/${id}`:this.baseUrl;
-    return this.http.put<Category>(url,{category:category,token:this.token});
+    return this.http.put<Category>(url,category,{headers:this.headers});
 
   }
 
   deleteCategory(idCategory : number): Observable<any> {
-    return this.http.delete(`${this.baseUrl}/${idCategory}`);
+    const url=`${this.baseUrl}/${idCategory}`;
+    return this.http.delete(url,{headers:this.headers});
   }
 
   isDeleteable(idCategory: number):Observable<DeleteCheckResponse>{
-    return this.http.get<DeleteCheckResponse>(`${this.baseUrl}/${idCategory}/can-delete`);
+    const url = `${this.baseUrl}/${idCategory}/can-delete`;
+    return this.http.get<DeleteCheckResponse>(url);
   }
 }

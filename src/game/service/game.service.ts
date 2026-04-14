@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { Game } from '../model/Game';
 import { GAME_DATA } from '../model/mock-games';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AuthService } from '../../core/service/auth.service';
 
 @Injectable({
@@ -16,6 +16,10 @@ export class GameService {
     private token:String = this.auth.getToken();
     private baseUrl = 'http://localhost:8080/game';
 
+    private headers = new HttpHeaders({
+    Authorization: `Bearer ${this.token}`
+  });
+
     getGames(title?: string, categoryId?: number): Observable<Game[]> {
         return this.http.get<Game[]>(this.composeFindUrl(title, categoryId));
     }
@@ -23,9 +27,9 @@ export class GameService {
     saveGame(game: Game): Observable<void> {
         const { id } = game;
         const url = id ? `${this.baseUrl}/${id}` : this.baseUrl;
-        console.log(game)
 
-        return this.http.put<void>(url,game,{headers:{Authorization: `${this.token}`}});
+
+        return this.http.put<void>(url,game,{headers:this.headers});
     }
 
     private composeFindUrl(title?: string, categoryId?: number): string {
