@@ -32,7 +32,7 @@ export class GameEditComponent implements OnInit {
   categories: Category[];
 
 
-  editMode:boolean;
+  editMode: boolean;
 
 
   constructor(
@@ -44,8 +44,8 @@ export class GameEditComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.game = this.data.object ? {...this.data.object}:new Game();
-    this.editMode=this.data.editMode;
+    this.game = this.data.object ? { ...this.data.object } : new Game();
+    this.editMode = this.data.editMode;
     //this.game = this.data.game ? Object.assign({}, this.data.game) : new Game();
 
     this.categoryService.getCategories().subscribe((categories) => {
@@ -76,12 +76,24 @@ export class GameEditComponent implements OnInit {
   }
 
   onSave() {
-    if(!this.editMode){
-      this.game.id=null;
+    if (!this.editMode) {
+      this.game.id = null;
     }
-    this.gameService.saveGame(this.game).subscribe((result) => {
-      this.dialogRef.close();
-    });
+    this.gameService.saveGame(this.game).subscribe(
+      {
+        next:()=>{
+          this.dialogRef.close();
+        }
+        ,
+        error:(err)=>{
+          switch(err.status){
+            case 401:console.error('Not Valid Token');break;
+            case 404:console.error('Not found Game');break;
+            default:console.error('Default');
+          }
+        }
+
+      });
   }
 
   onClose() {

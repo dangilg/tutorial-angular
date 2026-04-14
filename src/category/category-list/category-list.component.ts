@@ -77,7 +77,12 @@ export class CategoryListComponent implements OnInit {
                     this.ngOnInit();
                   },
                   error: (err) => {
-                    console.log(err)
+                    switch(err.status){
+                      case 401:console.error('not valid token');break;
+                      case 404:console.error('not found category');break;
+                      case 409:console.error('Cant delete Category in use');break;
+                      default:console.error('Default');
+                    }
                   }
                 }
               );

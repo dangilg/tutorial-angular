@@ -128,9 +128,23 @@ export class AuthorListComponent implements OnInit {
 
           dialogRef.afterClosed().subscribe((result) => {
             if (result) {
-              this.authorService.deleteAuthor(author.id).subscribe((result) => {
-                this.ngOnInit();
-              });
+              this.authorService.deleteAuthor(author.id).subscribe(
+                {
+                  next: () => {
+                    this.ngOnInit();
+
+                  }
+                  ,
+                  error: (err) => {
+                    switch (err.status) {
+                      case 401: console.error('not valid token');break;
+                      case 404: console.error('not found author');break;
+                      case 409: console.error('cant delete Author in use');break;
+                      default:console.error('Default');
+                    }
+                  }
+                }
+              );
             }
           });
         }

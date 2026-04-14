@@ -43,9 +43,21 @@ export class CategoryEditComponent implements OnInit {
         if(!this.editMode){
           this.category.id=null;
         }
-        console.log(this.category);
-        this.categoryService.saveCategory(this.category).subscribe(() => {
+
+        this.categoryService.saveCategory(this.category).subscribe(
+          {next:()=> {
             this.dialogRef.close();
+          },
+          error:(err)=>{
+            switch(err.status){
+              case 401:console.error('Not Valid Token');break;
+              case 404:console.error('Not Found Category');break;
+              default:console.error('Default');
+            }
+          }
+
+
+
         });
     }
 

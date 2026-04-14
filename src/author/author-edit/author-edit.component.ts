@@ -39,9 +39,20 @@ export class AuthorEditComponent implements OnInit {
       if(!this.editMode){
         this.author.id=null;
       }
-        this.authorService.saveAuthor(this.author).subscribe(() => {
-            this.dialogRef.close();
-        });
+        this.authorService.saveAuthor(this.author).subscribe(
+          {
+            next:()=>{
+              this.dialogRef.close();
+            },
+            error:(err)=>{
+              switch(err.status){
+                case 401:console.error('Not Valid Token');break;
+                case 404:console.error('Not Found Author');break;
+                default:console.error('Default');
+              }
+            }
+          }
+        );
     }
 
     onClose() {
