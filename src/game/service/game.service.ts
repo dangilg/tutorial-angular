@@ -3,15 +3,17 @@ import { Observable, of } from 'rxjs';
 import { Game } from '../model/Game';
 import { GAME_DATA } from '../model/mock-games';
 import { HttpClient } from '@angular/common/http';
+import { AuthService } from '../../core/service/auth.service';
 
 @Injectable({
     providedIn: 'root'
 })
 export class GameService {
     constructor(
-        private http: HttpClient
+        private http: HttpClient,
+        private auth: AuthService
     ) {}
-
+    private token:String = this.auth.getToken();
     private baseUrl = 'http://localhost:8080/game';
 
     getGames(title?: string, categoryId?: number): Observable<Game[]> {
@@ -21,8 +23,9 @@ export class GameService {
     saveGame(game: Game): Observable<void> {
         const { id } = game;
         const url = id ? `${this.baseUrl}/${id}` : this.baseUrl;
-        console.log()
-        return this.http.put<void>(url, game);
+        console.log(game)
+
+        return this.http.put<void>(url,game,{headers:{Authorization: `${this.token}`}});
     }
 
     private composeFindUrl(title?: string, categoryId?: number): string {

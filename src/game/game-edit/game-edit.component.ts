@@ -44,7 +44,7 @@ export class GameEditComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.game = this.data.object;
+    this.game = this.data.object ? {...this.data.object}:new Game();
     this.editMode=this.data.editMode;
     //this.game = this.data.game ? Object.assign({}, this.data.game) : new Game();
 
@@ -76,7 +76,9 @@ export class GameEditComponent implements OnInit {
   }
 
   onSave() {
-    console.log(this.game);
+    if(!this.editMode){
+      this.game.id=null;
+    }
     this.gameService.saveGame(this.game).subscribe((result) => {
       this.dialogRef.close();
     });

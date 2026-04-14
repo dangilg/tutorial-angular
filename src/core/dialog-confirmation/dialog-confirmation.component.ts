@@ -8,24 +8,24 @@ import { MatButtonModule } from '@angular/material/button';
     MatButtonModule
   ],
   templateUrl: './dialog-confirmation.component.html',
-  styleUrl:'./dialog-confirmation.component.scss'
+  styleUrl: './dialog-confirmation.component.scss'
 })
-export class DialogConfirmationComponent{
+export class DialogConfirmationComponent {
 
   title: string;
-    description: string;
+  description: string;
 
-    constructor(
-        public dialogRef: MatDialogRef<DialogConfirmationComponent>,
-        @Inject(MAT_DIALOG_DATA) public data: any
-    ) {}
+  constructor(
+    public dialogRef: MatDialogRef<DialogConfirmationComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: any
+  ) { }
 
-    ngOnInit(): void {
-        this.title = this.data.title;
-        this.description = this.data.description;
-    }
+  ngOnInit(): void {
+    this.title = this.data.title;
+    this.description = this.data.description;
+  }
 
-    onClose(value = false) {
-        this.dialogRef.close(value);
-    }
- }
+  onClose(value = false) {
+    this.dialogRef.close(value);
+  }
+}

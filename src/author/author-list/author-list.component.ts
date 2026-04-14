@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild} from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatPaginatorModule } from '@angular/material/paginator';
@@ -14,114 +14,129 @@ import { MatIconModule } from '@angular/material/icon';
 
 import { AuthService } from '../../core/service/auth.service';
 import { editCreateDataModel } from '../../core/model/editCreateDataModel';
+import { NotDeleteableComponent } from '../../core/notDeleteableComponent/notDeleteable.component';
 
 
 @Component({
-    selector: 'app-author-list',
-    imports: [MatButtonModule, MatIconModule, MatTableModule, CommonModule, MatPaginatorModule],
-    templateUrl: './author-list.component.html',
-    styleUrl: './author-list.component.scss',
+  selector: 'app-author-list',
+  imports: [MatButtonModule, MatIconModule, MatTableModule, CommonModule, MatPaginatorModule],
+  templateUrl: './author-list.component.html',
+  styleUrl: './author-list.component.scss',
 })
 export class AuthorListComponent implements OnInit {
-    pageNumber: number = 0;
-    pageSize: number = 5;
-    totalElements: number = 0;
+  pageNumber: number = 0;
+  pageSize: number = 5;
+  totalElements: number = 0;
 
-    dataSource = new MatTableDataSource<Author>();
-    displayedColumns: string[] = ['id', 'name', 'nationality', 'action'];
+  dataSource = new MatTableDataSource<Author>();
+  displayedColumns: string[] = ['id', 'name', 'nationality', 'action'];
 
-    isLoggedIn$ = this.authService.isLoggedIn$;
+  isLoggedIn$ = this.authService.isLoggedIn$;
 
-    @ViewChild(MatPaginator) paginator!:MatPaginator;
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
 
 
 
-    constructor(
-      private authorService: AuthorService,
-      public dialog: MatDialog,
-      private authService:AuthService
-    ) {}
+  constructor(
+    private authorService: AuthorService,
+    public dialog: MatDialog,
+    private authService: AuthService
+  ) { }
 
-    ngOnInit(): void {
-        this.loadPage();
+  ngOnInit(): void {
+    this.loadPage();
+  }
+
+
+  loadPage(event?: PageEvent) {
+
+    const pageable: Pageable = {
+      pageNumber: this.pageNumber,
+      pageSize: this.pageSize,
+      sort: [
+        {
+          property: 'id',
+          direction: 'ASC',
+        },
+      ],
+    };
+
+    if (event != null) {
+      pageable.pageSize = event.pageSize;
+      pageable.pageNumber = event.pageIndex;
     }
 
+    this.authorService.getAuthors(pageable).subscribe((data) => {
 
-    loadPage(event?: PageEvent) {
+      this.dataSource.data = data.content;
+      this.pageNumber = data.pageable.pageNumber;
+      this.pageSize = data.pageable.pageSize;
+      this.totalElements = data.totalElements;
 
-        const pageable: Pageable = {
-            pageNumber: this.pageNumber,
-            pageSize: this.pageSize,
-            sort: [
-                {
-                    property: 'id',
-                    direction: 'ASC',
-                },
-            ],
-        };
+    });
+  }
 
-        if (event != null) {
-            pageable.pageSize = event.pageSize;
-            pageable.pageNumber = event.pageIndex;
+  createAuthor() {
+    const id: number = this.totalElements + 1;
+    this.openEditCreateModal(
+      {
+        object: {
+          id: id,
+          name: '',
+          nationality: ''
+        },
+        editMode: false
+      }
+    )
+  }
+
+  editAuthor(author: Author) {
+    this.openEditCreateModal(
+      {
+        object: author,
+        editMode: true
+      }
+    )
+  }
+
+  private openEditCreateModal(data: editCreateDataModel<Author>) {
+    const dialogRef = this.dialog.open(AuthorEditComponent, {
+      data: data,
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      this.ngOnInit();
+    });
+  }
+  deleteAuthor(author: Author) {
+    this.authorService.isDeleteable(author.id).subscribe(
+      result => {
+        if (!result.canDelete) {
+          const dialogRef = this.dialog.open(NotDeleteableComponent, {
+            disableClose: true,
+            data: result
+          });
         }
-
-        this.authorService.getAuthors(pageable).subscribe((data) => {
-
-            this.dataSource.data = data.content;
-            this.pageNumber = data.pageable.pageNumber;
-            this.pageSize = data.pageable.pageSize;
-            this.totalElements = data.totalElements;
-
-        });
-    }
-
-    createAuthor() {
-        const id:number=this.totalElements+1;
-        this.openEditCreateModal(
-          {
-            object:{
-              id:id,
-              name:'',
-              nationality:''
-            },
-            editMode:false
-          }
-        )
-    }
-
-    editAuthor(author: Author) {
-        this.openEditCreateModal(
-          {
-            object:author,
-            editMode:true
-          }
-        )
-    }
-
-    private openEditCreateModal(data:editCreateDataModel<Author>){
-      const dialogRef = this.dialog.open(AuthorEditComponent, {
-            data: data,
-        });
-
-        dialogRef.afterClosed().subscribe((result) => {
-            this.ngOnInit();
-        });
-    }
-    deleteAuthor(author: Author) {
-        const dialogRef = this.dialog.open(DialogConfirmationComponent, {
+        else {
+          const dialogRef = this.dialog.open(DialogConfirmationComponent, {
             data: {
-                title: 'Eliminar autor',
-                description:
-                    'Atención si borra el autor se perderán sus datos.<br> ¿Desea eliminar el autor?',
+              title: 'Eliminar autor',
+              description:
+                'Atención si borra el autor se perderán sus datos.<br> ¿Desea eliminar el autor?',
             },
-        });
+          });
 
-        dialogRef.afterClosed().subscribe((result) => {
+          dialogRef.afterClosed().subscribe((result) => {
             if (result) {
-                this.authorService.deleteAuthor(author.id).subscribe((result) => {
-                    this.ngOnInit();
-                });
+              this.authorService.deleteAuthor(author.id).subscribe((result) => {
+                this.ngOnInit();
+              });
             }
-        });
-    }
+          });
+        }
+      }
+    )
+
+
+  }
 }

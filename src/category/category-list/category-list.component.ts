@@ -11,6 +11,7 @@ import { CategoryEditComponent } from '../category-edit/category-edit.component'
 import { editCreateDataModel } from '../../core/model/editCreateDataModel';
 import { DialogConfirmationComponent } from '../../core/dialog-confirmation/dialog-confirmation.component';
 import { AuthService } from '../../core/service/auth.service';
+import { NotDeleteableComponent } from '../../core/notDeleteableComponent/notDeleteable.component';
 
 @Component({
   selector: 'app-category-list',
@@ -33,7 +34,7 @@ export class CategoryListComponent implements OnInit {
   constructor(
     private categoryService: CategoryService,
     public dialog: MatDialog,
-    private authService:AuthService,
+    private authService: AuthService,
 
   ) {
   }
@@ -58,24 +59,34 @@ export class CategoryListComponent implements OnInit {
 
 
   funDelete(category: Category) {
-    const dialogRef = this.dialog.open(DialogConfirmationComponent, {
-      data: { title: "Eliminar categoría", description: "Atención si borra la categoría se perderán sus datos.<br> ¿Desea eliminar la categoría?" }
-    });
+    this.categoryService.isDeleteable(category.id).subscribe(
+      result => {
+        if (!result.canDelete) {
+          const dialogRef = this.dialog.open(NotDeleteableComponent, {disableClose:true, data: result });
+        }
+        else {
+          const dialogRef = this.dialog.open(DialogConfirmationComponent, {
+            data: { title: "Eliminar categoría", description: "Atención si borra la categoría se perderán sus datos.<br> ¿Desea eliminar la categoría?" }
+          });
 
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.categoryService.deleteCategory(category.id).subscribe(
-          {
-            next: () => {
-              this.ngOnInit();
-            },
-            error: (err) => {
-              console.log(err)
+          dialogRef.afterClosed().subscribe(result => {
+            if (result) {
+              this.categoryService.deleteCategory(category.id).subscribe(
+                {
+                  next: () => {
+                    this.ngOnInit();
+                  },
+                  error: (err) => {
+                    console.log(err)
+                  }
+                }
+              );
             }
-          }
-        );
+          });
+        }
       }
-    });
+    )
+
   }
 
   createCategry() {

@@ -6,6 +6,7 @@ import { AuthorPage } from '../model/AuthorPage';
 import { AUTHOR_DATA } from '../model/mock-authors';
 import { AUTHOR_DATA_LIST } from '../model/mock-author-list';
 import { HttpClient } from '@angular/common/http';
+import { DeleteCheckResponse } from '../../core/model/deleteCheckResponse';
 
 @Injectable({
     providedIn: 'root',
@@ -31,5 +32,8 @@ export class AuthorService {
 
     getAllAuthors(): Observable<Author[]> {
         return this.http.get<Author[]>(this.baseUrl);
+    }
+    isDeleteable(idAuthor:number):Observable<DeleteCheckResponse>{
+      return this.http.get<DeleteCheckResponse>(`${this.baseUrl}/${idAuthor}/can-delete`);
     }
 }
