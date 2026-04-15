@@ -5,7 +5,7 @@
         <h1>Crear autor</h1>
     }
 
-    <form>
+    <form #authorEditForm = "ngForm">
         <mat-form-field>
             <mat-label>Identificador</mat-label>
             <input type="text" matInput placeholder="Identificador" [(ngModel)]="author.id" name="id" disabled>
@@ -26,6 +26,6 @@
 
     <div class="buttons">
         <button mat-stroked-button (click)="onClose()">Cerrar</button>
-        <button mat-flat-button color="primary" (click)="onSave()">Guardar</button>
+        <button mat-flat-button color="primary" (click)="onSave()" [disabled]="authorEditForm.invalid || authorEditForm.pristine">Guardar</button>
     </div>
 </div>

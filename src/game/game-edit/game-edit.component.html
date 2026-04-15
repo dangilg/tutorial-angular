@@ -5,7 +5,7 @@
         <h1>Crear juego</h1>
     }
 
-    <form>
+    <form #gameEditForm="ngForm">
         <mat-form-field>
             <mat-label>Identificador</mat-label>
             <input type="text" matInput placeholder="Identificador" [(ngModel)]="game.id" name="id" disabled>
@@ -19,8 +19,8 @@
 
         <mat-form-field>
             <mat-label>Edad recomendada</mat-label>
-            <input type="number" matInput placeholder="Edad recomendada" [(ngModel)]="game.age" name="age" required>
-            <mat-error>La edad no puede estar vacía</mat-error>
+            <input type="number" matInput placeholder="Edad recomendada" [(ngModel)]="game.age" min="1" name="age" required >
+            <mat-error>La edad no puede estar vacía ni ser menor a 1</mat-error>
         </mat-form-field>
 
         <mat-form-field>
@@ -46,6 +46,6 @@
 
     <div class="buttons">
         <button mat-stroked-button (click)="onClose()">Cerrar</button>
-        <button mat-flat-button color="primary" (click)="onSave()">Guardar</button>
+        <button mat-flat-button color="primary" (click)="onSave()" [disabled]="gameEditForm.invalid || gameEditForm.pristine">Guardar</button>
     </div>
 </div>

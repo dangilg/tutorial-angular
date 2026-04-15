@@ -9,7 +9,7 @@
   }
 
 
-  <form >
+  <form #authForm="ngForm">
     <mat-form-field>
       <mat-label>Usuario</mat-label>
       <input type="text" matInput placeholder="Usuario" [(ngModel)]="user.username" name="username" required autocomplete="off" (click)="errorVisibility=false">
@@ -26,10 +26,10 @@
     <div class="buttons">
       <button mat-stroked-button type="button" (click)="onClose()">Cerrar</button>@switch(mode){
     @case (AuthMode.LOGIN) {
-      <button mat-flat-button color="primary" type="button" (click)="logIn()">Iniciar Sesión</button>
+      <button mat-flat-button color="primary" type="button" (click)="logIn()" [disabled]="authForm.invalid||authForm.pristine">Iniciar Sesión</button>
     }
     @case (AuthMode.SIGNIN) {
-      <button mat-flat-button color="primary" type="button" (click)="signIn()">Registrarse</button>
+      <button mat-flat-button color="primary" type="button" (click)="signIn()"  [disabled]="authForm.invalid||authForm.pristine">Registrarse</button>
     }
   }
 

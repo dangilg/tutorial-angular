@@ -6,7 +6,7 @@
   @else{
     <h1>Crear categoría</h1>
   }
-    <form>
+    <form #categoryEditForm="ngForm">
         <mat-form-field>
             <mat-label>Identificador</mat-label>
             <input type="text" matInput placeholder="Identificador" [(ngModel)]="category.id" name="id" disabled>
@@ -21,6 +21,6 @@
 
     <div class="buttons">
         <button mat-stroked-button (click)="onClose()">Cerrar</button>
-        <button mat-flat-button color="primary" (click)="onSave()">Guardar</button>
+        <button mat-flat-button color="primary" (click)="onSave()" [disabled]="categoryEditForm.invalid || categoryEditForm.pristine">Guardar</button>
     </div>
 </div>
