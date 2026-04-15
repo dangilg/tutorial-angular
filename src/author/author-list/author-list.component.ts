@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, signal } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatPaginatorModule } from '@angular/material/paginator';
@@ -26,7 +26,8 @@ import { NotDeleteableComponent } from '../../core/notDeleteableComponent/notDel
 export class AuthorListComponent implements OnInit {
   pageNumber: number = 0;
   pageSize: number = 5;
-  totalElements: number = 0;
+
+  totalElements=signal(0);
 
   dataSource = new MatTableDataSource<Author>();
   displayedColumns: string[] = ['id', 'name', 'nationality', 'action'];
@@ -71,13 +72,13 @@ export class AuthorListComponent implements OnInit {
       this.dataSource.data = data.content;
       this.pageNumber = data.pageable.pageNumber;
       this.pageSize = data.pageable.pageSize;
-      this.totalElements = data.totalElements;
+      this.totalElements.set(data.totalElements);
 
     });
   }
 
   createAuthor() {
-    const id: number = this.totalElements + 1;
+    const id: number = this.totalElements()+1;
     this.openEditCreateModal(
       {
         object: {
