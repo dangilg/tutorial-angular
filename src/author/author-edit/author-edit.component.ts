@@ -42,7 +42,7 @@ export class AuthorEditComponent implements OnInit {
         this.authorService.saveAuthor(this.author).subscribe(
           {
             next:()=>{
-              this.dialogRef.close();
+              this.dialogRef.close(true);
             },
             error:(err)=>{
               switch(err.status){
@@ -56,6 +56,6 @@ export class AuthorEditComponent implements OnInit {
     }
 
     onClose() {
-        this.dialogRef.close();
+        this.dialogRef.close(false);
     }
 }

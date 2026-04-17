@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, OnInit, signal } from '@angular/core';
 import { MatFormField, MatLabel, MatError } from "@angular/material/form-field";
 import { MatInput } from "@angular/material/input";
 import { MatButtonModule } from '@angular/material/button';
@@ -31,10 +31,13 @@ export class AuthModalComponent implements OnInit {
   user: User;
   hidePassword: boolean = true;
 
-  errorVisibility: boolean = false;
+
+  errorVisibility=false;
+
   errorMessage: String = "";
 
   isLoggedIn$ = this.authService.isLoggedIn$;
+
   AuthMode = AuthMode;
   mode: AuthMode;
   constructor(
@@ -61,7 +64,8 @@ export class AuthModalComponent implements OnInit {
     this.authModalService.sigIn(this.user).subscribe(
       {
         next: (response) => {
-          this.errorVisibility = false;
+          this.errorVisibility=false;
+
 
           //el usuario se ha registrado correctamente,
           //guardamos el token en SessionStorage para completar el logIn automático tras el register
@@ -71,7 +75,8 @@ export class AuthModalComponent implements OnInit {
         error: (err) => {
           if (err.status === 409) {
             this.errorMessage = "User Already Exists";
-            this.errorVisibility = true;
+            this.errorVisibility=true;
+            //this.errorVisibility.set(true);
             this.cdr.detectChanges();
           }
         }
@@ -84,8 +89,9 @@ export class AuthModalComponent implements OnInit {
       {
         next:(response)=>{
 
-            this.errorVisibility=false;
 
+
+            console.log(this.errorVisibility);
             this.authService.login(response.token);
             this.dialogRef.close();
         },
@@ -93,7 +99,10 @@ export class AuthModalComponent implements OnInit {
 
           if(err.status===401){
             this.errorMessage = "Wrong User or Password";
-            this.errorVisibility = true;
+
+            this.errorVisibility=true;
+
+            console.log(this.errorVisibility);
             this.cdr.detectChanges();
           }
         }
