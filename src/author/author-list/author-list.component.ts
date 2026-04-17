@@ -29,10 +29,14 @@ export class AuthorListComponent implements OnInit {
 
   totalElements=signal(0);
 
+  nextId:number = -1;
+
   dataSource = new MatTableDataSource<Author>();
   displayedColumns: string[] = ['id', 'name', 'nationality', 'action'];
 
   isLoggedIn$ = this.authService.isLoggedIn$;
+
+
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
@@ -42,7 +46,7 @@ export class AuthorListComponent implements OnInit {
     private authorService: AuthorService,
     public dialog: MatDialog,
     private authService: AuthService
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     this.loadPage();
@@ -50,7 +54,8 @@ export class AuthorListComponent implements OnInit {
 
 
   loadPage(event?: PageEvent) {
-
+    console.log("event");
+    console.log(event);
     const pageable: Pageable = {
       pageNumber: this.pageNumber,
       pageSize: this.pageSize,
@@ -67,18 +72,40 @@ export class AuthorListComponent implements OnInit {
       pageable.pageNumber = event.pageIndex;
     }
 
+
+
     this.authorService.getAuthors(pageable).subscribe((data) => {
 
+
       this.dataSource.data = data.content;
-      this.pageNumber = data.pageable.pageNumber;
-      this.pageSize = data.pageable.pageSize;
-      this.totalElements.set(data.totalElements);
+      console.log('tamaño authors list:')
+      console.log(this.dataSource.data.length);
+
+      if(this.dataSource.data.length==0&&pageable.pageNumber!=0){
+        const evt:PageEvent={
+          pageIndex:pageable.pageNumber-1,
+          previousPageIndex:pageable.pageNumber,
+          pageSize:pageable.pageSize,
+          length:data.totalElements
+        }
+        this.loadPage(evt);
+      }
+      else{
+        this.pageNumber = data.pageable.pageNumber;
+        this.pageSize = data.pageable.pageSize;
+        this.totalElements.set(data.totalElements);
+      }
+
+      if(this.nextId<data.totalElements){
+        this.nextId=data.totalElements+1;
+        console.log('nextId:'+ this.nextId);
+      }
 
     });
   }
 
   createAuthor() {
-    const id: number = this.totalElements()+1;
+    const id: number = this.nextId;
     this.openEditCreateModal(
       {
         object: {
@@ -106,10 +133,22 @@ export class AuthorListComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe((result) => {
+      console.log(result);
+      if(result &&!data.editMode){
+        this.nextId+=1;
+
+        if(this.dataSource.data.length==this.pageSize){
+          this.pageNumber+=1;
+        }
+      }
+
       this.ngOnInit();
     });
   }
+
+
   deleteAuthor(author: Author) {
+    console.log(this.pageNumber);
     this.authorService.isDeleteable(author.id).subscribe(
       result => {
         if (!result.canDelete) {
@@ -133,7 +172,6 @@ export class AuthorListComponent implements OnInit {
                 {
                   next: () => {
                     this.ngOnInit();
-
                   }
                   ,
                   error: (err) => {
