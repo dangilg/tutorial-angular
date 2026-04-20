@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, signal } from '@angular/core';
+import { Component, OnInit, ViewChild, effect, signal } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatPaginatorModule } from '@angular/material/paginator';
@@ -24,12 +24,13 @@ import { NotDeleteableComponent } from '../../core/notDeleteableComponent/notDel
   styleUrl: './author-list.component.scss',
 })
 export class AuthorListComponent implements OnInit {
-  pageNumber: number = 0;
+  NEXTID = 'author_Next_Id';
+  pageNumber=signal(0);
   pageSize: number = 5;
 
   totalElements=signal(0);
 
-  nextId:number = -1;
+  nextId=signal<number>(Number(sessionStorage.getItem(this.NEXTID))||-1);
 
   dataSource = new MatTableDataSource<Author>();
   displayedColumns: string[] = ['id', 'name', 'nationality', 'action'];
@@ -46,7 +47,12 @@ export class AuthorListComponent implements OnInit {
     private authorService: AuthorService,
     public dialog: MatDialog,
     private authService: AuthService
-  ) {}
+  ) {
+    effect(()=>{
+    sessionStorage.setItem(this.NEXTID,this.nextId().toString());
+    }
+  );
+  }
 
   ngOnInit(): void {
     this.loadPage();
@@ -57,7 +63,7 @@ export class AuthorListComponent implements OnInit {
     console.log("event");
     console.log(event);
     const pageable: Pageable = {
-      pageNumber: this.pageNumber,
+      pageNumber: this.pageNumber(),
       pageSize: this.pageSize,
       sort: [
         {
@@ -91,13 +97,13 @@ export class AuthorListComponent implements OnInit {
         this.loadPage(evt);
       }
       else{
-        this.pageNumber = data.pageable.pageNumber;
+        this.pageNumber.set(data.pageable.pageNumber);
         this.pageSize = data.pageable.pageSize;
         this.totalElements.set(data.totalElements);
       }
 
-      if(this.nextId<data.totalElements){
-        this.nextId=data.totalElements+1;
+      if(this.nextId()<data.totalElements){
+        this.nextId.set(data.totalElements+1);
         console.log('nextId:'+ this.nextId);
       }
 
@@ -105,7 +111,7 @@ export class AuthorListComponent implements OnInit {
   }
 
   createAuthor() {
-    const id: number = this.nextId;
+    const id: number = this.nextId();
     this.openEditCreateModal(
       {
         object: {
@@ -135,10 +141,10 @@ export class AuthorListComponent implements OnInit {
     dialogRef.afterClosed().subscribe((result) => {
       console.log(result);
       if(result &&!data.editMode){
-        this.nextId+=1;
+        this.nextId.update(valor=>valor+1);
 
         if(this.dataSource.data.length==this.pageSize){
-          this.pageNumber+=1;
+          this.pageNumber.update(valor=>valor+1);
         }
       }
 
