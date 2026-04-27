@@ -1,6 +1,6 @@
 
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -21,7 +21,7 @@ import { AuthMode } from '../../userAuth/model/AuthMode';
   templateUrl: './headerComponent.html',
   styleUrl: './headerComponent.scss',
 })
-export class HeaderComponent {
+export class HeaderComponent implements OnInit{
   title = 'tutorial Angular';
 
   isLoggedIn$ = this.authService.isLoggedIn$;
@@ -32,6 +32,16 @@ export class HeaderComponent {
 
   }
 
+  ngOnInit(): void {
+    //console.log('init header')
+    this.authService.isTokenValid().subscribe(
+      isValid=>{
+        if(!isValid){
+          this.logOut()
+        }
+      }
+    )
+  }
   openSignInModal() {
     const dialogRef = this.dialog.open(AuthModalComponent, {
       disableClose: true,

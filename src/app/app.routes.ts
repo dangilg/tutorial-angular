@@ -14,7 +14,12 @@ export const routes: Routes = [
     loadComponent:()=>import('../game/game-list/game-list.component').then(m=>m.GameListComponent)
   },
   {
+    path:'clients',
+    loadComponent:()=>import('../client/client-list/client-list.component').then(m=>m.ClientListComponent)
+  },
+  {
     path:'',
     loadComponent:()=>import('../game/game-list/game-list.component').then(m=>m.GameListComponent)
-  }
+  },
+
 ];
