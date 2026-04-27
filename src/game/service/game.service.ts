@@ -13,13 +13,18 @@ export class GameService {
         private http: HttpClient,
         private auth: AuthService
     ) {}
-    private token:String = this.auth.getToken();
+    private token= this.auth.getToken();
     private baseUrl = 'http://localhost:8080/game';
 
-    private headers = new HttpHeaders({
-    Authorization: `Bearer ${this.token}`
-  });
 
+
+    setNextGameId(nextId:number){
+      sessionStorage.setItem('nextGameId',nextId.toString());
+    }
+
+    getNextGameId():number{
+      return Number(sessionStorage.getItem('nextGameId'));
+    }
     getGames(title?: string, categoryId?: number): Observable<Game[]> {
         return this.http.get<Game[]>(this.composeFindUrl(title, categoryId));
     }
@@ -29,7 +34,7 @@ export class GameService {
         const url = id ? `${this.baseUrl}/${id}` : this.baseUrl;
 
 
-        return this.http.put<void>(url,game,{headers:this.headers});
+        return this.http.put<void>(url,game);
     }
 
     private composeFindUrl(title?: string, categoryId?: number): string {

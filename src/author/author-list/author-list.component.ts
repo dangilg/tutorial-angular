@@ -60,8 +60,8 @@ export class AuthorListComponent implements OnInit {
 
 
   loadPage(event?: PageEvent) {
-    console.log("event");
-    console.log(event);
+    //console.log("event");
+    //console.log(event);
     const pageable: Pageable = {
       pageNumber: this.pageNumber(),
       pageSize: this.pageSize,
@@ -84,8 +84,8 @@ export class AuthorListComponent implements OnInit {
 
 
       this.dataSource.data = data.content;
-      console.log('tamaño authors list:')
-      console.log(this.dataSource.data.length);
+      //console.log('tamaño authors list:')
+      //console.log(this.dataSource.data.length);
 
       if(this.dataSource.data.length==0&&pageable.pageNumber!=0){
         const evt:PageEvent={
@@ -104,7 +104,7 @@ export class AuthorListComponent implements OnInit {
 
       if(this.nextId()<data.totalElements){
         this.nextId.set(data.totalElements+1);
-        console.log('nextId:'+ this.nextId);
+        //console.log('nextId:'+ this.nextId);
       }
 
     });
@@ -139,7 +139,7 @@ export class AuthorListComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe((result) => {
-      console.log(result);
+      //console.log(result);
       if(result &&!data.editMode){
         this.nextId.update(valor=>valor+1);
 
@@ -154,7 +154,7 @@ export class AuthorListComponent implements OnInit {
 
 
   deleteAuthor(author: Author) {
-    console.log(this.pageNumber);
+    //console.log(this.pageNumber);
     this.authorService.isDeleteable(author.id).subscribe(
       result => {
         if (!result.canDelete) {

@@ -42,7 +42,7 @@ export class GameListComponent implements OnInit {
   filterCategory: Category;
   filterTitle: string;
 
-  nextGameId: number;
+  nextGameId;
 
   isLoggedIn$ = this.authService.isLoggedIn$;
 
@@ -55,11 +55,31 @@ export class GameListComponent implements OnInit {
 
 
   ngOnInit(): void {
+
     this.gameService.getGames().subscribe((games) => {
       this.games.set(games);
-      this.nextGameId=this.games().length+1;
+      const size = games.length;
+      if(this.gameService.getNextGameId()){
+        if(size!=0){
+          const lastId = games[size-1].id;
+          if(lastId>=this.gameService.getNextGameId()){
+            this.gameService.setNextGameId(lastId+1);
+          }
+        }
+      }
+      else{
+        if(size!=0){
+          this.gameService.setNextGameId(games[size-1].id +1);
+        }
+        else{
+          this.gameService.setNextGameId(1);
+        }
+      }
+      this.nextGameId = this.gameService.getNextGameId();
     }
-  )
+    )
+    this.filterTitle = null;
+    this.filterCategory = null;
 
     this.categoryService
       .getCategories()
@@ -85,8 +105,8 @@ export class GameListComponent implements OnInit {
   }
 
 
-  private openEditCreateModal(data: editCreateDataModel<Game>){
-  const dialogRef = this.dialog.open(GameEditComponent, {
+  private openEditCreateModal(data: editCreateDataModel<Game>) {
+    const dialogRef = this.dialog.open(GameEditComponent, {
       data: data,
     });
     return dialogRef;
@@ -94,11 +114,11 @@ export class GameListComponent implements OnInit {
 
   createGame() {
     let game = new Game();
-    game.id=this.nextGameId;
+    game.id = this.nextGameId;
     const dialogRef = this.openEditCreateModal(
       {
-        object:game,
-        editMode:false
+        object: game,
+        editMode: false
       }
     );
 
@@ -108,11 +128,11 @@ export class GameListComponent implements OnInit {
   }
 
   editGame(game: Game) {
-    console.log(game);
+    //console.log(game);
     const dialogRef = this.openEditCreateModal(
       {
-        object:game,
-        editMode:true
+        object: game,
+        editMode: true
       }
     );
 

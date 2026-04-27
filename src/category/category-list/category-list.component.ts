@@ -30,6 +30,7 @@ export class CategoryListComponent implements OnInit {
   displayedColumns: string[] = ['id', 'name', 'action'];
 
   isLoggedIn$ = this.authService.isLoggedIn$;
+  nextId;
 
   constructor(
     private categoryService: CategoryService,
@@ -41,8 +42,34 @@ export class CategoryListComponent implements OnInit {
 
   ngOnInit(): void {
     this.categoryService.getCategories().subscribe(
-      categories => this.dataSource.data = categories
+      categories => {
+        this.dataSource.data = categories;
+        const size = this.dataSource.data.length;
+
+        if(this.categoryService.getNextId()){
+          if(size!=0){
+            const lastId = this.dataSource.data[size - 1].id;
+            if(lastId>=this.categoryService.getNextId()){
+              this.categoryService.setNextId(lastId+1);
+            }
+          }
+        }
+        else{
+          console.log('else');
+          if(size!=0){
+            this.categoryService.setNextId(this.dataSource.data[size-1].id +1);
+          }
+          else{
+            this.categoryService.setNextId(1);
+          }
+        }
+        this.nextId=this.categoryService.getNextId();
+      }
     );
+
+
+
+
   }
 
   funEdit(category: Category) {
@@ -62,7 +89,7 @@ export class CategoryListComponent implements OnInit {
     this.categoryService.isDeleteable(category.id).subscribe(
       result => {
         if (!result.canDelete) {
-          const dialogRef = this.dialog.open(NotDeleteableComponent, {disableClose:true, data: result });
+          const dialogRef = this.dialog.open(NotDeleteableComponent, { disableClose: true, data: result });
         }
         else {
           const dialogRef = this.dialog.open(DialogConfirmationComponent, {
@@ -77,11 +104,11 @@ export class CategoryListComponent implements OnInit {
                     this.ngOnInit();
                   },
                   error: (err) => {
-                    switch(err.status){
-                      case 401:console.error('not valid token');break;
-                      case 404:console.error('not found category');break;
-                      case 409:console.error('Cant delete Category in use');break;
-                      default:console.error('Default');
+                    switch (err.status) {
+                      case 401: console.error('not valid token'); break;
+                      case 404: console.error('not found category'); break;
+                      case 409: console.error('Cant delete Category in use'); break;
+                      default: console.error('Default');
                     }
                   }
                 }
@@ -95,7 +122,7 @@ export class CategoryListComponent implements OnInit {
   }
 
   createCategry() {
-    const id: number = this.dataSource.data[this.dataSource.data.length - 1].id + 1;
+    const id: number = this.nextId;
     this.openEditCreateModal(
       {
         object:
