@@ -21,23 +21,23 @@ export class AuthorService {
     private baseUrl = 'http://localhost:8080/author';
     private token = this.auth.getToken();
 
-    private headers = new HttpHeaders({
-    Authorization: `Bearer ${this.token}`
-  });
+
 
     getAuthors(pageable: Pageable): Observable<AuthorPage> {
         return this.http.post<AuthorPage>(this.baseUrl, { pageable: pageable });
     }
 
     saveAuthor(author: Author): Observable<Author> {
+        //console.log("token");
+        //console.log(this.token);
         const { id } = author;
         const url = id ? `${this.baseUrl}/${id}` : this.baseUrl;
-        return this.http.put<Author>(url, author,{headers:this.headers});
+        return this.http.put<Author>(url, author);
     }
 
     deleteAuthor(idAuthor: number): Observable<void> {
       const url = `${this.baseUrl}/${idAuthor}`;
-        return this.http.delete<void>(url,{headers:this.headers});
+        return this.http.delete<void>(url);
     }
 
     getAllAuthors(): Observable<Author[]> {
@@ -47,4 +47,5 @@ export class AuthorService {
       const url = `${this.baseUrl}/${idAuthor}/can-delete`
       return this.http.get<DeleteCheckResponse>(url);
     }
+
 }

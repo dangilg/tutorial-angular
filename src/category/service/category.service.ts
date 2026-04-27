@@ -16,11 +16,15 @@ export class CategoryService {
   ) { }
 
   private baseUrl = 'http://localhost:8080/category';
-  private token = this.auth.getToken();
 
-  private headers = new HttpHeaders({
-    Authorization: `Bearer ${this.token}`
-  });
+  getNextId():number{
+    const nextIdStr = sessionStorage.getItem('nextCategoryId');
+    return Number(nextIdStr);
+  }
+
+  setNextId(nextId:number){
+    sessionStorage.setItem('nextCategoryId',nextId.toString());
+  }
 
 
   getCategories(): Observable<Category[]> {
@@ -33,13 +37,13 @@ export class CategoryService {
    saveCategory(category: Category): Observable<Category> {
     const {id} =category;
     const url = id? `${this.baseUrl}/${id}`:this.baseUrl;
-    return this.http.put<Category>(url,category,{headers:this.headers});
+    return this.http.put<Category>(url,category);
 
   }
 
   deleteCategory(idCategory : number): Observable<any> {
     const url=`${this.baseUrl}/${idCategory}`;
-    return this.http.delete(url,{headers:this.headers});
+    return this.http.delete(url);
   }
 
   isDeleteable(idCategory: number):Observable<DeleteCheckResponse>{

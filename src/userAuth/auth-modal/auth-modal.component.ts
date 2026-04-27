@@ -91,7 +91,7 @@ export class AuthModalComponent implements OnInit {
 
 
 
-            console.log(this.errorVisibility);
+            //console.log(this.errorVisibility);
             this.authService.login(response.token);
             this.dialogRef.close();
         },
@@ -102,7 +102,7 @@ export class AuthModalComponent implements OnInit {
 
             this.errorVisibility=true;
 
-            console.log(this.errorVisibility);
+            //console.log(this.errorVisibility);
             this.cdr.detectChanges();
           }
         }
