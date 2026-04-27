@@ -12,7 +12,7 @@ export class CategoryService {
 
   constructor(
     private http:HttpClient,
-    private auth:AuthService
+
   ) { }
 
   private baseUrl = 'http://localhost:8080/category';

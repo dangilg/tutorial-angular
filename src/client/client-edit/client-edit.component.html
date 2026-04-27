@@ -1,0 +1,32 @@
+<div class="container">
+  @if(editMode){
+  <h1>Modificar cliente</h1>
+  }
+  @else{
+  <h1>Crear cliente</h1>
+  }
+  <form #clientEditForm="ngForm">
+    <mat-form-field>
+      <mat-label>Identificador</mat-label>
+      <input type="text" matInput placeholder="Identificador" [(ngModel)]="client.id" name="id" disabled>
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Nombre</mat-label>
+      <input type="text" matInput placeholder="Nombre de categoría" [(ngModel)]="client.name" name="name" required
+        #nameCtrl="ngModel">
+      @if(nameCtrl.hasError('required')){
+      <mat-error>El nombre no puede estar vacio</mat-error>
+      }
+      @if(nameCtrl.hasError('alreadyExists')){
+        <mat-error >El nombre no puede coincidir con un cliente existente</mat-error>
+      }
+    </mat-form-field>
+  </form>
+
+  <div class="buttons">
+    <button mat-stroked-button (click)="onClose()">Cerrar</button>
+    <button mat-flat-button color="primary" (click)="onSave()"
+      [disabled]="clientEditForm.invalid || clientEditForm.pristine">Guardar</button>
+  </div>
+</div>
