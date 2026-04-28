@@ -22,7 +22,7 @@ import { editCreateDataModel } from '../../core/model/editCreateDataModel';
 export class AuthorEditComponent implements OnInit {
     author: Author;
     editMode:boolean;
-
+    id:number;
     constructor(
         public dialogRef: MatDialogRef<AuthorEditComponent>,
         @Inject(MAT_DIALOG_DATA) public data: editCreateDataModel<Author>,
@@ -31,7 +31,7 @@ export class AuthorEditComponent implements OnInit {
 
     ngOnInit(): void {
         this.author = this.data.object ? Object.assign({}, this.data.object) : new Author();
-
+        this.id = this.data.id;
         this.editMode = this.data.editMode;
     }
 

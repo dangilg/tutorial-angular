@@ -34,6 +34,7 @@ export class GameEditComponent implements OnInit {
 
   editMode: boolean;
 
+  id:number;
 
   constructor(
     public dialogRef: MatDialogRef<GameEditComponent>,
@@ -46,6 +47,7 @@ export class GameEditComponent implements OnInit {
   ngOnInit(): void {
     this.game = this.data.object ? { ...this.data.object } : new Game();
     this.editMode = this.data.editMode;
+    this.id = this.data.id;
     //this.game = this.data.game ? Object.assign({}, this.data.game) : new Game();
 
     this.categoryService.getCategories().subscribe((categories) => {

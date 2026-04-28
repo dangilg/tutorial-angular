@@ -30,7 +30,7 @@ export class CategoryListComponent implements OnInit {
   displayedColumns: string[] = ['id', 'name', 'action'];
 
   isLoggedIn$ = this.authService.isLoggedIn$;
-  nextId;
+  nextId = -1;
 
   constructor(
     private categoryService: CategoryService,
@@ -78,6 +78,7 @@ export class CategoryListComponent implements OnInit {
       {
         object: category
         ,
+        id:category.id,
         editMode: true
       }
     )
@@ -130,6 +131,7 @@ export class CategoryListComponent implements OnInit {
           id: id,
           name: ''
         },
+        id:id,
         editMode: false
       }
     )

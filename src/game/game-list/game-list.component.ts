@@ -118,6 +118,7 @@ export class GameListComponent implements OnInit {
     const dialogRef = this.openEditCreateModal(
       {
         object: game,
+        id:game.id,
         editMode: false
       }
     );
@@ -132,6 +133,7 @@ export class GameListComponent implements OnInit {
     const dialogRef = this.openEditCreateModal(
       {
         object: game,
+        id:game.id,
         editMode: true
       }
     );

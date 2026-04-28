@@ -79,6 +79,7 @@ export class ClientListComponent implements OnInit {
       {
         object: client
         ,
+        id:client.id,
         editMode: true
       }
     )
@@ -93,6 +94,7 @@ export class ClientListComponent implements OnInit {
           id: id,
           name: ''
         },
+        id:id,
         editMode: false
       }
     )

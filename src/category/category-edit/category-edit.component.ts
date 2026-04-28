@@ -24,6 +24,8 @@ import { editCreateDataModel } from '../../core/model/editCreateDataModel';
 export class CategoryEditComponent implements OnInit {
     category: Category;
     editMode: boolean;
+    id:number;
+
     constructor(
         public dialogRef: MatDialogRef<CategoryEditComponent>,
         private categoryService: CategoryService,
@@ -34,7 +36,7 @@ export class CategoryEditComponent implements OnInit {
       //si existe this.data.category -> crear nuevo objeto con los datos del mismo
       //sino, nuevo objeto vacío.
         this.category = this.data.object ? {...this.data.object}:new Category();
-
+        this.id = this.data.id;
         this.editMode =this.data.editMode;
 
     }

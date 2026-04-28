@@ -119,6 +119,7 @@ export class AuthorListComponent implements OnInit {
           name: '',
           nationality: ''
         },
+        id:id,
         editMode: false
       }
     )
@@ -128,6 +129,7 @@ export class AuthorListComponent implements OnInit {
     this.openEditCreateModal(
       {
         object: author,
+        id:author.id,
         editMode: true
       }
     )
