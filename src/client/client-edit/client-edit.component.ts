@@ -27,7 +27,7 @@ export class ClientEditComponent implements OnInit {
   client: Client;
   editMode: boolean;
   errMsg: string = "a";
-
+  id:number;
   constructor(
     public dialogRef: MatDialogRef<ClientEditComponent>,
     private clientService: ClientService,
@@ -38,7 +38,7 @@ export class ClientEditComponent implements OnInit {
     //si existe this.data.category -> crear nuevo objeto con los datos del mismo
     //sino, nuevo objeto vacío.
     this.client = this.data.object ? { ...this.data.object } : new Client();
-
+    this.id = this.data.id;
     this.editMode = this.data.editMode;
     // this.nameCtrl.control.setErrors({ alreadyExists: false });
   }
@@ -48,7 +48,7 @@ export class ClientEditComponent implements OnInit {
       this.client.id = null;
     }
 
-    this.clientService.saveCategory(this.client).subscribe(
+    this.clientService.saveClient(this.client).subscribe(
       {
         next: () => {
           this.dialogRef.close();
@@ -57,7 +57,7 @@ export class ClientEditComponent implements OnInit {
           switch (err.status) {
             case 401: console.error('Not Valid Token'); break;
             case 404: console.error('Not Found Client'); break;
-            case 409: console.error('Client Already Exists'); this.nameCtrl.control.setErrors({ duplicated: true }); break;
+            case 409: console.error('Client Already Exists'); this.nameCtrl.control.setErrors({ alreadyExists: true }); break;
             default: console.error('Default');
           }
         }

@@ -37,9 +37,10 @@ export class ClientService {
     return this.http.delete(url);
   }
 
-  saveCategory(client: Client): Observable<Client> {
+  saveClient(client: Client): Observable<Client> {
     const { id } = client;
     const url = id ? `${this.baseUrl}/${id}` : this.baseUrl;
+
     return this.http.put<Client>(url, client);
 
   }
