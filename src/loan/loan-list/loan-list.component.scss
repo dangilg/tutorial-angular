@@ -1,0 +1,80 @@
+.container {
+  margin: 20px;
+
+  .filters {
+    display:inline-flex;
+
+    mat-form-field {
+      width: 255;
+      margin-right: 20px;
+    }
+
+    .buttons {
+      display: flex;
+      flex-direction: column;
+      align-self: center;
+      gap: 0.75rem;
+
+
+      button {
+        margin-left: 50px;
+      }
+    }
+  }
+
+  .loan-list {
+    margin-top: 20px;
+    margin-bottom: 20px;
+
+    mat-table {
+        margin-top: 10px;
+        margin-bottom: 20px;
+
+        .mat-header-row {
+            background-color:#f5f5f5;
+
+            .mat-header-cell {
+                text-transform: uppercase;
+                font-weight: bold;
+                color: #838383;
+            }
+        }
+
+        .mat-column-id {
+            flex: 0 0 18%;
+            justify-content: center;
+        }
+
+        .mat-column-game {
+            flex: 0 0 18%;
+            justify-content: center;
+        }
+        .mat-column-client {
+            flex: 0 0 18%;
+            justify-content: center;
+        }
+        .mat-column-startDate {
+            flex: 0 0 18%;
+            justify-content: center;
+        }
+        .mat-column-endDate {
+            flex: 0 0 18%;
+            justify-content: center;
+        }
+        .mat-column-action {
+            flex: 0 0 10%;
+            justify-content: center;
+        }
+    }
+  }
+
+  .buttons {
+    text-align: right;
+  }
+}
+
+
+
+
+
+

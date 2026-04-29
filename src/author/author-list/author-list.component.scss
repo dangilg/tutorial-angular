@@ -16,10 +16,18 @@
         }
 
         .mat-column-id {
-            flex: 0 0 20%;
+            flex: 0 0 30%;
             justify-content: center;
         }
 
+        .mat-column-name {
+            flex: 0 0 30%;
+            justify-content: center;
+        }
+        .mat-column-nationality {
+            flex: 0 0 30%;
+            justify-content: center;
+        }
         .mat-column-action {
             flex: 0 0 10%;
             justify-content: center;

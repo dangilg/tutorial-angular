@@ -18,6 +18,10 @@ export const routes: Routes = [
     loadComponent:()=>import('../client/client-list/client-list.component').then(m=>m.ClientListComponent)
   },
   {
+    path:'loans',
+    loadComponent:()=>import('../loan/loan-list/loan-list.component').then(m=>m.LoanListComponent)
+  },
+  {
     path:'',
     loadComponent:()=>import('../game/game-list/game-list.component').then(m=>m.GameListComponent)
   },

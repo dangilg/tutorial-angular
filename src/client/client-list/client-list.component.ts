@@ -107,7 +107,7 @@ export class ClientListComponent implements OnInit {
             }
             else {
               const dialogRef = this.dialog.open(DialogConfirmationComponent, {
-                data: { title: "Eliminar categoría", description: "Atención si borra la categoría se perderán sus datos.<br> ¿Desea eliminar la categoría?" }
+                data: { title: "Eliminar cliente", description: "Atención si borra el cliente se perderán sus datos.<br> ¿Desea eliminar el cliente?" }
               });
 
               dialogRef.afterClosed().subscribe(result => {
