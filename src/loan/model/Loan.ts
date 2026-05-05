@@ -6,6 +6,6 @@ export class Loan{
   game:Game;
   client:Client;
   //todo: deberían ser Date, pero las ponemos String para la demo
-  startDate:string;
-  endDate:string;
+  start_date:string;
+  end_date:string;
 }
