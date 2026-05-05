@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { Pageable } from '../../core/model/page/Pageable';
 import { Author } from '../model/Author';
-import { AuthorPage } from '../model/AuthorPage';
+import { PageData } from '../../core/model/page/PageData';
 import { AUTHOR_DATA } from '../model/mock-authors';
 import { AUTHOR_DATA_LIST } from '../model/mock-author-list';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
@@ -23,8 +23,9 @@ export class AuthorService {
 
 
 
-    getAuthors(pageable: Pageable): Observable<AuthorPage> {
-        return this.http.post<AuthorPage>(this.baseUrl, { pageable: pageable });
+    getAuthors(pageable: Pageable): Observable<PageData<Author>> {
+
+        return this.http.post<PageData<Author>>(this.baseUrl, { pageable: pageable });
     }
 
     saveAuthor(author: Author): Observable<Author> {
