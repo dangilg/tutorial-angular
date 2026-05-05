@@ -1,5 +1,5 @@
 import { Component, OnInit, signal } from '@angular/core';
-import { MatNativeDateModule } from '@angular/material/core';
+
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormField, MatFormFieldModule, MatLabel, MatSuffix } from '@angular/material/form-field';
 import { MatOption, MatSelectModule } from '@angular/material/select';
@@ -18,7 +18,16 @@ import { LoanService } from '../service/loan.service';
 import { ClientService } from '../../client/service/client.service';
 import { GameService } from '../../game/service/game.service';
 
+import { MatMomentDateModule } from '@angular/material-moment-adapter';
+import moment, { Moment } from 'moment';
+import { Pageable } from '../../core/model/page/Pageable';
+import { FilterDataModel } from '../model/FilterDataModel';
+import { SortPage } from '../../core/model/page/SortPage';
+import { M } from '@angular/cdk/keycodes';
+
+
 @Component({
+  standalone: true,
   selector: 'app-loan-list',
 
   imports: [
@@ -28,7 +37,7 @@ import { GameService } from '../../game/service/game.service';
     MatOption,
     MatSuffix,
     MatDatepickerModule,
-    MatNativeDateModule,
+    MatMomentDateModule,
     MatButtonModule,
     MatIconModule,
     MatTableModule,
@@ -45,40 +54,43 @@ export class LoanListComponent implements OnInit {
 
   filterGame: Game;
   filterClient: Client;
-  filterDate: Date;
+
+
+  filterDate: Moment;
 
   games: Game[];
   clients: Client[];
 
   loansList = new MatTableDataSource<Loan>();
-  displayedColumns: string[] = ['id', 'game', 'client','startDate','endDate', 'action'];
+  displayedColumns: string[] = ['id', 'game', 'client', 'startDate', 'endDate', 'action'];
 
   isLoggedIn$ = this.authService.isLoggedIn$;
 
-pageNumber=signal(0);
+  pageNumber = signal(0);
   pageSize: number = 5;
 
-  totalElements=signal(0);
+  totalElements = signal(0);
 
-  nextId=signal<number>(Number(sessionStorage.getItem('loanNextId')||-1));
+  sort:SortPage = {
+    property:'id',
+    direction:'ASC'
+  }
+
+  nextId = signal<number>(Number(sessionStorage.getItem('loanNextId') || -1));
 
   constructor(
     private authService: AuthService,
     private loanService: LoanService,
-    private clientService:ClientService,
-    private gameServie: GameService
+    private clientService: ClientService,
+    private gameServie: GameService,
+
   ) {
 
   }
-  //todo esto es solo para la demo
-  ngOnInit(): void {
-    const data = this.loanService.getAuthors();
-    this.loansList.data= data.content;
-    this.pageNumber.set(data.pageable.pageNumber);
-    this.pageSize = data.pageable.pageSize;
-    this.totalElements.set(data.totalElements);
 
-    //todo esto si q se debría quedar [inicialmente esta bn]
+  ngOnInit(): void {
+    this.filterDate = moment();
+
     this.clientService.getClients().subscribe(
       clients => {
         this.clients = clients;
@@ -87,28 +99,168 @@ pageNumber=signal(0);
     )
 
     this.gameServie.getGames().subscribe(
-      games=>{
+      games => {
         this.games = games;
       }
     )
-  }
 
-  loadPage(event:PageEvent){
+    this.getLoans();
+    //todo esto es solo para la demo
+    /*
+    const data = this.loanService.getAuthors();
+    this.loansList.data = data.content;
+    this.pageNumber.set(data.pageable.pageNumber);
+    this.pageSize = data.pageable.pageSize;
+    this.totalElements.set(data.totalElements);
+*/
 
-  }
-  onCleanFilter() {
-
-  }
-  onSearch() {
-
-  }
-  editLoan(loan:Loan){
-
-  }
-  deleteLoan(loan:Loan){
 
   }
-  createLoan(){
+
+  getLoans(event?:PageEvent){
+    const pageable:Pageable = this.getPageable(event);
+    const filters:FilterDataModel = this.getFilters();
+    this.loanService.getLoans({
+      pageable :pageable,
+      filters: filters
+    }).subscribe(
+      (data)=>{
+        console.log(data);
+        this.loansList.data = data.content;
+
+        //console.log('tamaño authors list:')
+        //console.log(this.dataSource.data.length);
+
+        if (this.loansList.data.length == 0 && pageable.pageNumber != 0) {
+          const evt: PageEvent = {
+            pageIndex: pageable.pageNumber - 1,
+            previousPageIndex: pageable.pageNumber,
+            pageSize: pageable.pageSize,
+            length: data.totalElements
+          }
+          this.getLoans(evt);
+        }
+        else {
+          this.pageNumber.set(data.pageable.pageNumber);
+          this.pageSize = data.pageable.pageSize;
+          this.totalElements.set(data.totalElements);
+        }
+
+        if (this.nextId() < data.totalElements) {
+          this.nextId.set(data.totalElements + 1);
+          //console.log('nextId:'+ this.nextId);
+        }
+      }
+    );
 
   }
-}
+
+  getPageable(event?:PageEvent):Pageable{
+    const pageable:Pageable = {
+      pageNumber:this.pageNumber(),
+      pageSize:this.pageSize,
+      sort:[
+        {
+          property:'id',
+          direction:'ASC'
+        },
+      ],
+    };
+
+    if(event!=null){
+      pageable.pageSize=event.pageSize;
+      pageable.pageNumber=event.pageIndex;
+    }
+
+    return pageable;
+  }
+
+  getFilters():FilterDataModel{
+    return {
+      gameId : this.filterGame !=null ? this.filterGame.id : null,
+      clientId :this.filterClient !=null ? this.filterClient.id : null,
+      date :this.filterDate !=null ? this.filterDate.format('YYYY-MM-DD') : null
+    };
+  }
+
+
+/*
+  loadPage(event?: PageEvent) {
+      const pageable: Pageable = {
+        pageNumber: this.pageNumber(),
+        pageSize: this.pageSize,
+        sort: [
+          {
+            property: 'id',
+            direction: 'ASC',
+          },
+        ],
+      };
+
+      if (event != null) {
+        pageable.pageSize = event.pageSize;
+        pageable.pageNumber = event.pageIndex;
+      }
+
+
+
+      this.loanService.getLoans(pageable).subscribe((data) => {
+
+
+        this.loansList.data = data.content;
+        //console.log('tamaño authors list:')
+        //console.log(this.dataSource.data.length);
+
+        if (this.loansList.data.length == 0 && pageable.pageNumber != 0) {
+          const evt: PageEvent = {
+            pageIndex: pageable.pageNumber - 1,
+            previousPageIndex: pageable.pageNumber,
+            pageSize: pageable.pageSize,
+            length: data.totalElements
+          }
+          this.loadPage(evt);
+        }
+        else {
+          this.pageNumber.set(data.pageable.pageNumber);
+          this.pageSize = data.pageable.pageSize;
+          this.totalElements.set(data.totalElements);
+        }
+
+        if (this.nextId() < data.totalElements) {
+          this.nextId.set(data.totalElements + 1);
+          //console.log('nextId:'+ this.nextId);
+        }
+
+      });
+    }
+*/
+    onCleanFilter():void{
+      this.filterClient = null;
+      this.filterGame = null;
+      this.filterDate = moment();
+      this.getLoans({
+        pageIndex: 0,
+        pageSize: this.pageSize,
+        length: this.totalElements()
+      });
+    }
+
+    onSearch():void {
+      this.getLoans({
+        pageIndex: 0,
+        pageSize: this.pageSize,
+        length: this.totalElements()
+      });
+
+    }
+    editLoan(loan: Loan) {
+
+    }
+    deleteLoan(loan: Loan) {
+
+    }
+    createLoan() {
+
+    }
+
+  }
