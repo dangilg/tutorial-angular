@@ -23,7 +23,10 @@ import moment, { Moment } from 'moment';
 import { Pageable } from '../../core/model/page/Pageable';
 import { FilterDataModel } from '../model/FilterDataModel';
 import { SortPage } from '../../core/model/page/SortPage';
-import { M } from '@angular/cdk/keycodes';
+
+import { editCreateDataModel } from '../../core/model/editCreateDataModel';
+import { MatDialog } from '@angular/material/dialog';
+import { LoanEditComponent } from '../loan-edit/loan-edit.component';
 
 
 @Component({
@@ -71,9 +74,9 @@ export class LoanListComponent implements OnInit {
 
   totalElements = signal(0);
 
-  sort:SortPage = {
-    property:'id',
-    direction:'ASC'
+  sort: SortPage = {
+    property: 'id',
+    direction: 'ASC'
   }
 
   nextId = signal<number>(Number(sessionStorage.getItem('loanNextId') || -1));
@@ -83,6 +86,7 @@ export class LoanListComponent implements OnInit {
     private loanService: LoanService,
     private clientService: ClientService,
     private gameServie: GameService,
+    private dialog: MatDialog,
 
   ) {
 
@@ -105,31 +109,23 @@ export class LoanListComponent implements OnInit {
     )
 
     this.getLoans();
-    //todo esto es solo para la demo
-    /*
-    const data = this.loanService.getAuthors();
-    this.loansList.data = data.content;
-    this.pageNumber.set(data.pageable.pageNumber);
-    this.pageSize = data.pageable.pageSize;
-    this.totalElements.set(data.totalElements);
-*/
+
 
 
   }
 
-  getLoans(event?:PageEvent){
-    const pageable:Pageable = this.getPageable(event);
-    const filters:FilterDataModel = this.getFilters();
+  getLoans(event?: PageEvent) {
+    const pageable: Pageable = this.getPageable(event);
+    const filters: FilterDataModel = this.getFilters();
     this.loanService.getLoans({
-      pageable :pageable,
+      pageable: pageable,
       filters: filters
     }).subscribe(
-      (data)=>{
+      (data) => {
         console.log(data);
         this.loansList.data = data.content;
 
-        //console.log('tamaño authors list:')
-        //console.log(this.dataSource.data.length);
+
 
         if (this.loansList.data.length == 0 && pageable.pageNumber != 0) {
           const evt: PageEvent = {
@@ -148,119 +144,104 @@ export class LoanListComponent implements OnInit {
 
         if (this.nextId() < data.totalElements) {
           this.nextId.set(data.totalElements + 1);
-          //console.log('nextId:'+ this.nextId);
+
         }
       }
     );
 
   }
 
-  getPageable(event?:PageEvent):Pageable{
-    const pageable:Pageable = {
-      pageNumber:this.pageNumber(),
-      pageSize:this.pageSize,
-      sort:[
+  getPageable(event?: PageEvent): Pageable {
+    const pageable: Pageable = {
+      pageNumber: this.pageNumber(),
+      pageSize: this.pageSize,
+      sort: [
         {
-          property:'id',
-          direction:'ASC'
+          property: 'id',
+          direction: 'ASC'
         },
       ],
     };
 
-    if(event!=null){
-      pageable.pageSize=event.pageSize;
-      pageable.pageNumber=event.pageIndex;
+    if (event != null) {
+      pageable.pageSize = event.pageSize;
+      pageable.pageNumber = event.pageIndex;
     }
 
     return pageable;
   }
 
-  getFilters():FilterDataModel{
+  getFilters(): FilterDataModel {
     return {
-      gameId : this.filterGame !=null ? this.filterGame.id : null,
-      clientId :this.filterClient !=null ? this.filterClient.id : null,
-      date :this.filterDate !=null ? this.filterDate.format('YYYY-MM-DD') : null
+      gameId: this.filterGame != null ? this.filterGame.id : null,
+      clientId: this.filterClient != null ? this.filterClient.id : null,
+      date: this.filterDate != null ? this.filterDate.format('YYYY-MM-DD') : null
     };
   }
 
 
-/*
-  loadPage(event?: PageEvent) {
-      const pageable: Pageable = {
-        pageNumber: this.pageNumber(),
-        pageSize: this.pageSize,
-        sort: [
-          {
-            property: 'id',
-            direction: 'ASC',
-          },
-        ],
-      };
 
-      if (event != null) {
-        pageable.pageSize = event.pageSize;
-        pageable.pageNumber = event.pageIndex;
-      }
+  onCleanFilter(): void {
+    this.filterClient = null;
+    this.filterGame = null;
+    this.filterDate = moment();
+    this.getLoans({
+      pageIndex: 0,
+      pageSize: this.pageSize,
+      length: this.totalElements()
+    });
+  }
 
-
-
-      this.loanService.getLoans(pageable).subscribe((data) => {
-
-
-        this.loansList.data = data.content;
-        //console.log('tamaño authors list:')
-        //console.log(this.dataSource.data.length);
-
-        if (this.loansList.data.length == 0 && pageable.pageNumber != 0) {
-          const evt: PageEvent = {
-            pageIndex: pageable.pageNumber - 1,
-            previousPageIndex: pageable.pageNumber,
-            pageSize: pageable.pageSize,
-            length: data.totalElements
-          }
-          this.loadPage(evt);
-        }
-        else {
-          this.pageNumber.set(data.pageable.pageNumber);
-          this.pageSize = data.pageable.pageSize;
-          this.totalElements.set(data.totalElements);
-        }
-
-        if (this.nextId() < data.totalElements) {
-          this.nextId.set(data.totalElements + 1);
-          //console.log('nextId:'+ this.nextId);
-        }
-
-      });
-    }
-*/
-    onCleanFilter():void{
-      this.filterClient = null;
-      this.filterGame = null;
-      this.filterDate = moment();
-      this.getLoans({
-        pageIndex: 0,
-        pageSize: this.pageSize,
-        length: this.totalElements()
-      });
-    }
-
-    onSearch():void {
-      this.getLoans({
-        pageIndex: 0,
-        pageSize: this.pageSize,
-        length: this.totalElements()
-      });
-
-    }
-    editLoan(loan: Loan) {
-
-    }
-    deleteLoan(loan: Loan) {
-
-    }
-    createLoan() {
-
-    }
+  onSearch(): void {
+    this.getLoans({
+      pageIndex: 0,
+      pageSize: this.pageSize,
+      length: this.totalElements()
+    });
 
   }
+  editLoan(loan: Loan) {
+    this.openEditCreateModal(
+      {
+        object: loan,
+        id: loan.id,
+        editMode: true
+      }
+    )
+  }
+
+  createLoan() {
+    const id: number = this.nextId();
+    this. openEditCreateModal(
+      {
+        object:{
+          id:id,
+          game:null,
+          client:null,
+          start_date:'',
+          end_date:''
+        },
+        id:id,
+        editMode:false
+      }
+    )
+  }
+
+  private openEditCreateModal(data: editCreateDataModel<Loan>) {
+
+    const dialogRef = this.dialog.open(LoanEditComponent, {
+      data: data
+    });
+
+
+    dialogRef.afterClosed().subscribe(result => {
+      this.ngOnInit();
+    });
+  }
+
+  deleteLoan(loan: Loan) {
+
+  }
+
+
+}
