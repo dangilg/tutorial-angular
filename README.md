@@ -65,3 +65,6 @@ En el modal de editarCategoria, a la hora de crear una nueva categoria, mantenem
 (id de la última categoría + 1)
 
 A la hora de hacer un LogIn o un Register, usamos el mismo MatDialog para mantener componentes reutilizables, pasando por la option Data de MatDialog el tipo q es. El MatDialog solo puede ser de los tipos que pertenezcan al Enum AuthMode
+
+Prestamos:
+Eliminamos el mensaje de error al guardad en el caso de que las fechas del préstamo superen el periodo máximo (14 días) ya que aplicamos un filtro en el DatePicker de Devolución, así como la detección de cambios en el DatePicker de Préstamos que detecta si se supera el periodo máximo y restablece a null el DatePicker de Devolución
