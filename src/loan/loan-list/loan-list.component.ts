@@ -59,7 +59,7 @@ export class LoanListComponent implements OnInit {
   filterClient: Client;
 
 
-  filterDate: Moment;
+  filterDate: Moment = null;
 
   games: Game[];
   clients: Client[];
@@ -93,7 +93,9 @@ export class LoanListComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.filterDate = moment();
+    if (!this.filterDate) {
+      this.filterDate = moment();
+    }
 
     this.clientService.getClients().subscribe(
       clients => {
@@ -124,6 +126,7 @@ export class LoanListComponent implements OnInit {
       (data) => {
         console.log(data);
         this.loansList.data = data.content;
+        console.log(this.loansList.data);
 
 
 
@@ -212,17 +215,17 @@ export class LoanListComponent implements OnInit {
 
   createLoan() {
     const id: number = this.nextId();
-    this. openEditCreateModal(
+    this.openEditCreateModal(
       {
-        object:{
-          id:id,
-          game:null,
-          client:null,
-          start_date:'',
-          end_date:''
+        object: {
+          id: id,
+          game: null,
+          client: null,
+          startDate: '',
+          endDate: ''
         },
-        id:id,
-        editMode:false
+        id: id,
+        editMode: false
       }
     )
   }

@@ -57,12 +57,12 @@
 
       <ng-container matColumnDef="startDate">
         <mat-header-cell *matHeaderCellDef> Fecha del prestamo </mat-header-cell>
-        <mat-cell *matCellDef="let element"> {{element.start_date|date:'dd/MM/yyyy'}} </mat-cell>
+        <mat-cell *matCellDef="let element"> {{element.startDate|date:'dd/MM/yyyy'}} </mat-cell>
       </ng-container>
 
       <ng-container matColumnDef="endDate">
         <mat-header-cell *matHeaderCellDef> Fecha de devolucion</mat-header-cell>
-        <mat-cell *matCellDef="let element"> {{element.end_date|date:'dd/MM/yyyy'}} </mat-cell>
+        <mat-cell *matCellDef="let element"> {{element.endDate|date:'dd/MM/yyyy'}} </mat-cell>
       </ng-container>
 
       <ng-container matColumnDef="action">
@@ -88,7 +88,7 @@
 
     @if(isLoggedIn$|async){
     <div class="buttons">
-      <button mat-flat-button color="primary" (click)="createLoan()">Nuevo autor</button>
+      <button mat-flat-button color="primary" (click)="createLoan()">Nuevo Prestamo</button>
     </div>
     }
   </div>
