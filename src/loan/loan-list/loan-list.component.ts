@@ -55,11 +55,11 @@ import { LoanEditComponent } from '../loan-edit/loan-edit.component';
 })
 export class LoanListComponent implements OnInit {
 
-  filterGame: Game;
-  filterClient: Client;
+  filterGame: Game = null;
+  filterClient: Client = null;
 
 
-  filterDate: Moment;
+  filterDate: Moment = moment();
 
   games: Game[];
   clients: Client[];
@@ -79,7 +79,7 @@ export class LoanListComponent implements OnInit {
     direction: 'ASC'
   }
 
-  nextId = signal<number>(Number(sessionStorage.getItem('loanNextId') || -1));
+  nextId = signal<number>(-1);
 
   constructor(
     private authService: AuthService,
@@ -93,7 +93,9 @@ export class LoanListComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.filterDate = moment();
+   this.loanService.getCount().subscribe(count=>{
+    this.nextId.set(count+1);
+   });
 
     this.clientService.getClients().subscribe(
       clients => {
@@ -124,6 +126,7 @@ export class LoanListComponent implements OnInit {
       (data) => {
         console.log(data);
         this.loansList.data = data.content;
+        console.log(this.loansList.data);
 
 
 
@@ -142,10 +145,9 @@ export class LoanListComponent implements OnInit {
           this.totalElements.set(data.totalElements);
         }
 
-        if (this.nextId() < data.totalElements) {
-          this.nextId.set(data.totalElements + 1);
 
-        }
+
+
       }
     );
 
@@ -157,7 +159,7 @@ export class LoanListComponent implements OnInit {
       pageSize: this.pageSize,
       sort: [
         {
-          property: 'id',
+          property: 'startDate',
           direction: 'ASC'
         },
       ],
@@ -212,17 +214,17 @@ export class LoanListComponent implements OnInit {
 
   createLoan() {
     const id: number = this.nextId();
-    this. openEditCreateModal(
+    this.openEditCreateModal(
       {
-        object:{
-          id:id,
-          game:null,
-          client:null,
-          start_date:'',
-          end_date:''
+        object: {
+          id: id,
+          game: null,
+          client: null,
+          startDate: '',
+          endDate: ''
         },
-        id:id,
-        editMode:false
+        id: id,
+        editMode: false
       }
     )
   }

@@ -17,6 +17,8 @@ import { MatDatepickerInput, MatDatepickerModule, MatDatepickerToggle } from "@a
 import moment, { Moment } from 'moment';
 import { MatMomentDateModule } from '@angular/material-moment-adapter';
 import { CommonModule } from '@angular/common';
+import { Interval } from '../model/available/Interval';
+import { interval, range } from 'rxjs';
 
 
 @Component({
@@ -32,95 +34,152 @@ import { CommonModule } from '@angular/common';
     MatDatepickerModule,
     MatMomentDateModule,
     CommonModule
-],
+  ],
   templateUrl: './loan-edit.component.html',
-  styleUrl:'./loan-edit.component.scss'
+  styleUrl: './loan-edit.component.scss'
 })
-export class LoanEditComponent implements OnInit{
-  loan:Loan;
+export class LoanEditComponent implements OnInit {
+  loan: Loan;
   editMode: boolean;
-  id:number;
 
-  games:Game[];
-  clients:Client[];
+  validStartDates:Interval[]=null;
+  validEndDates:Interval[]=null;
 
-  startDate:Moment|null = null;
+  games: Game[];
+  clients: Client[];
+
+  startDateFilter = (date: Moment | null): boolean => {
 
 
 
-  endDate:Moment|null = null;
-  endDateFilter = (date:Moment|null):boolean=>{
-    if(!date) return false;
-    if(!this.startDate) return true;
+    if (!date) return false;
+
+    const day = date.clone().startOf('day');
+
+    if (date.isBefore(moment(), 'day')) return false;
+
+    if(!this.validStartDates || this.validStartDates.length===0){
+      return true
+    }
+
+    return this.validStartDates.some(interval =>{
+      const start = moment(interval.start).startOf('day');
+      const end = moment(interval.end).startOf('day');
+
+      return day.isSameOrAfter(start) && day.isSameOrBefore(end);
+    })
+  }
+
+  endDateFilter = (date: Moment | null): boolean => {
+
+    if (!date) return false;
+    const day = date.clone().startOf('day');
+
+    if (!this.startDate) return false;
+
+    if (day.isBefore(moment(), 'day')) return false;
 
     const min = this.startDate.clone();
-    const max = this.startDate.clone().add(13,'days');
+    const max = this.startDate.clone().add(13, 'days');
 
-    return date.isSameOrAfter(min,'day') && date.isSameOrBefore(max,'day');
+    if(!(day.isSameOrAfter(min,'day') && day.isSameOrBefore(max,'day'))){
+      return false;
+    }
+
+    if(!this.validEndDates || this.validEndDates.length === 0){
+      return true;
+    }
+
+    return this.validEndDates.some(interval => {
+      const start = moment(interval.start).startOf('day');
+      const end = moment(interval.end).startOf('day');
+
+      return day.isSameOrAfter(start) && day.isSameOrBefore(end);
+    })
   };
 
 
-  dateClass = (date:Moment):string=>{
-    console.log(date.format('DD/MM/YYYY'));
-    if(this.startDate && date.isSame(this.startDate,'day')){
+  dateClass = (date: Moment): string => {
+
+    const startDate: Moment = this.form.get('startDate').value;
+    const endDate: Moment = this.form.get('endDate').value;
+    if (startDate && date.isSame(startDate, 'day')) {
       return 'start-date';
     }
-    if(this.endDate && date.isSame(this.endDate,'day')){
+    if (endDate && date.isSame(endDate, 'day')) {
       return 'end-date';
     }
     return '';
   }
 
+  get startDate() {
+    return this.form.get('startDate').value
+  }
 
-  gameSelected = new FormControl();
-  clientSelected = new FormControl();
-  startDateSelected = new FormControl();
-  endDateSelected = new FormControl();
-  form = new FormGroup({
-    gameSelected:this.gameSelected,
-    clientSelected:this.clientSelected,
-    startDateSelected:this.startDateSelected,
-    endDateSelected:this.endDateSelected
+  get endDate() {
+    return this.form.get('endDate').value
+  }
+
+
+  form = new FormGroup<{
+    id: FormControl<string | null>;
+    game: FormControl<Game | null>;
+    client: FormControl<Client | null>;
+    startDate: FormControl<Moment | null>;
+    endDate: FormControl<Moment | null>;
+  }>({
+    id: new FormControl({ value: '', disabled: true }),
+    game: new FormControl(null),
+    client: new FormControl(null),
+    startDate: new FormControl<Moment | null>(null),
+    endDate: new FormControl<Moment | null>(null)
   });
 
+
   constructor(
-    public dialogRef:MatDialogRef<LoanEditComponent>,
+    public dialogRef: MatDialogRef<LoanEditComponent>,
     @Inject(MAT_DIALOG_DATA) public data: editCreateDataModel<Loan>,
-    private loanService:LoanService,
-    private clientservice:ClientService,
-    private gameService:GameService
-  ){}
+    private loanService: LoanService,
+    private clientservice: ClientService,
+    private gameService: GameService
+  ) { }
 
-  ngOnInit():void{
+  ngOnInit(): void {
 
-    Object.keys(this.form.controls).forEach(
-      key=>{
-        this.form.get(key)?.valueChanges.subscribe(
-          value=>{
-            console.log(key);
-            console.log(value);
-          }
-        );
+
+    this.form.valueChanges.subscribe(
+      value => {
+
+        this.onFieldChange(value);
+
       }
     );
 
-    this.loan = this.data.object?{...this.data.object}: new Loan();
-    this.editMode = this.data.editMode;
-    this.id = this.data.id;
 
-    this.startDate = moment(this.loan.start_date);
-    this.endDate = moment(this.loan.end_date);
+
+    this.loan = this.data.object ? { ...this.data.object } : new Loan();
+    this.editMode = this.data.editMode;
+
+
+    this.form.setValue({
+      id: this.data.id.toString(),
+      game: this.loan.game ?? null,
+      client: this.loan.client ?? null,
+      startDate: this.loan.startDate ? moment(this.loan.startDate) : null,
+      endDate: this.loan.endDate ? moment(this.loan.endDate) : null
+
+    }, { emitEvent: true });
 
     this.gameService.getGames().subscribe(
-      (games)=>{
-        this.games=games;
+      (games) => {
+        this.games = games;
 
-        if(this.loan.game!=null){
-          const gameFilter:Game[] = games.filter(
-            (game)=>
+        if (this.loan.game != null) {
+          const gameFilter: Game[] = games.filter(
+            (game) =>
               game.id == this.loan.game.id
           );
-          if(gameFilter!=null){
+          if (gameFilter != null) {
             this.loan.game = gameFilter[0];
           }
         }
@@ -128,15 +187,15 @@ export class LoanEditComponent implements OnInit{
     );
 
     this.clientservice.getClients().subscribe(
-      (clients)=>{
+      (clients) => {
         this.clients = clients;
 
-        if(this.loan.client != null){
-          const clientFilter:Client[] = clients.filter(
-            (client)=>
+        if (this.loan.client != null) {
+          const clientFilter: Client[] = clients.filter(
+            (client) =>
               client.id == this.loan.client.id
           );
-          if(clientFilter!=null){
+          if (clientFilter != null) {
             this.loan.client = clientFilter[0];
           }
         }
@@ -145,37 +204,81 @@ export class LoanEditComponent implements OnInit{
 
   }
 
-  onSave(){
-
+  onSave() {
+    const formValue = this.form.value;
+    this.loanService.saveLoan({
+      loanId: this.data.editMode ?this.data.id : null,
+      clientId: formValue.client?.id ?? null,
+      gameId: formValue.game?.id ?? null,
+      startDate: formValue.startDate?.format('YYYY-MM-DD') ?? null,
+      endDate: formValue.endDate?.format('YYYY-MM-DD') ?? null
+    }).subscribe();
+    this.dialogRef.close();
   }
 
-  onClose(){
-
+  onClose() {
+    this.dialogRef.close();
   }
 
+  clean(){
+    this.form.patchValue({
+      game:null,
+      client:null,
+      startDate:null,
+      endDate:null
+    },{
+      emitEvent:false
+    })
 
-  onStartChange(){
-    if(this.startDate && this.endDate){
-      if(this.endDate.isBefore(this.startDate)){
-        this.endDate = null;
+    this.form.updateValueAndValidity({emitEvent:true});
+  }
+  onFieldChange(formValue: typeof this.form.value) {
+    console.log('onFieldChange')
+    console.log(formValue);
+
+    this.validateDates();
+
+    this.loanService.getAvailables({
+      loanId: this.data.editMode ?this.data.id : null,
+      clientId: formValue.client?.id ?? null,
+      gameId: formValue.game?.id ?? null,
+      startDate: formValue.startDate?.format('YYYY-MM-DD') ?? null,
+      endDate: formValue.endDate?.format('YYYY-MM-DD') ?? null
+    }).subscribe(
+      (data)=>{
+        console.log('me he suscrito');
+        console.log(data);
+        this.clients = data.clients;
+        this.games = data.games;
+        this.validStartDates = data.validStartDates;
+        this.validEndDates = data.validEndDates;
       }
-      const diff = this.endDate.diff(this.startDate,'days');
+    )
 
-      if(Math.abs(diff)>13){
-        this.endDate=null;
+
+  }
+  validateDates() {
+    if (this.startDate && this.endDate) {
+      if (this.endDate.isBefore(this.startDate)) {
+        this.form.get('endDate').setValue(null);
+        return;
+      }
+
+      const diff = this.endDate.diff(this.startDate, 'days');
+
+      if (Math.abs(diff) > 13) {
+        this.form.get('endDate').setValue(null);
       }
     }
   }
 
-  onEndChange(){
-    if(this.startDate && this.endDate){
-      const diff = this.endDate.diff(this.startDate,'days');
+  compareById = (element1:any, element2:any):boolean=>{
 
-      if(Math.abs(diff)>13){
-        this.endDate=null;
-      }
-    }
-  }
+    return element1 && element2 ? element1.id === element2.id : element1===element2;
+  };
 
 
- }
+
+
+
+}

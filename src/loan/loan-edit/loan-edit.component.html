@@ -5,16 +5,16 @@
   @else{
   <h1>Crear Prestamo</h1>
   }
-  <form #categoryEditForm="ngForm">
+  <form [formGroup]="form">
     <mat-form-field>
       <mat-label>Identificador</mat-label>
-      <input type="text" matInput placeholder="Identificador" [(ngModel)]="id" name="id" disabled>
+      <input type="text" matInput placeholder="Identificador" formControlName="id">
     </mat-form-field>
 
     <mat-form-field>
       <mat-label>Nombre del juego</mat-label>
-      <mat-select class="filterInput" disableRipple [(ngModel)]="loan.game" name="game" required
-      [formControl]="gameSelected">
+      <mat-select class="filterInput" disableRipple  required
+      formControlName="game" [compareWith]="compareById">
         @for(game of games; track game.id){
         <mat-option [value]="game">{{game.title}}</mat-option>
         }
@@ -23,8 +23,8 @@
 
     <mat-form-field>
       <mat-label>Nombre del cliente</mat-label>
-      <mat-select class="filterInput" disableRipple [(ngModel)]="loan.client" name="client" required
-      [formControl]="clientSelected">
+      <mat-select class="filterInput" disableRipple required
+      formControlName="client" [compareWith]="compareById">
         @for(client of clients; track client.id){
         <mat-option [value]="client">{{client.name}}</mat-option>
         }
@@ -36,15 +36,15 @@
         <mat-label>Fecha del prestamo</mat-label>
         <input matInput
         [matDatepicker]="startPicker"
-        [(ngModel)]="startDate"
-        (dateChange)="onStartChange()"
+
+        [matDatepickerFilter]="startDateFilter"
 
         (click)="startPicker.open()"
         readonly
         name="startDate"
         class="dateFilter"
         required
-        [formControl]="startDateSelected"
+        formControlName="startDate"
         />
         <mat-datepicker-toggle matSuffix
         [for]="startPicker"
@@ -59,15 +59,15 @@
         <mat-label>Fecha de devolucion</mat-label>
         <input matInput
         [matDatepicker]="endPicker"
-        [(ngModel)]="endDate"
+
         (click)="endPicker.open()"
-        (dateChange)="onEndChange()"
+
         [matDatepickerFilter]="endDateFilter"
         readonly
         name="endDate"
         class="dateFilter"
         required
-        [formControl]="endDateSelected"
+        formControlName="endDate"
         />
         <mat-datepicker-toggle matSuffix
         [for]="endPicker"
@@ -81,8 +81,9 @@
   </form>
 
   <div class="buttons">
+    <button mat-stroked-button (click)="clean()">Limpiar</button>
     <button mat-stroked-button (click)="onClose()">Cerrar</button>
     <button mat-flat-button color="primary" (click)="onSave()"
-      [disabled]="categoryEditForm.invalid || categoryEditForm.pristine">Guardar</button>
+      [disabled]="form.invalid || form.pristine">Guardar</button>
   </div>
 </div>
