@@ -45,4 +45,8 @@ export class LoanService {
     console.log(dto)
     return this.http.put<void>(url,dto);
   }
+
+  getCount():Observable<number>{
+    return this.http.get<number>(`${this.baseUrl}/count`)
+  }
 }

@@ -213,6 +213,7 @@ export class LoanEditComponent implements OnInit {
       startDate: formValue.startDate?.format('YYYY-MM-DD') ?? null,
       endDate: formValue.endDate?.format('YYYY-MM-DD') ?? null
     }).subscribe();
+    this.dialogRef.close();
   }
 
   onClose() {

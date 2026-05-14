@@ -23,10 +23,16 @@
         </mat-form-field>
         <mat-form-field>
           <mat-label>Fecha</mat-label>
-          <input matInput [matDatepicker]="picker" [(ngModel)]="filterDate" (click)="picker.open()" readonly name="date" class="filterInput"/>
+          <input matInput [matDatepicker]="picker" [(ngModel)]="filterDate" (click)="picker.open()" readonly name="date"
+            class="filterInput" />
 
           <mat-datepicker-toggle matSuffix [for]="picker">
           </mat-datepicker-toggle>
+          @if(filterDate){
+          <button mat-icon-button matSuffix  (click)="filterDate = null" type="button">
+            <mat-icon>close</mat-icon>
+          </button>
+        }
 
           <mat-datepicker #picker></mat-datepicker>
           <mat-error>error</mat-error>
@@ -66,18 +72,18 @@
       </ng-container>
 
       <ng-container matColumnDef="action">
-            <mat-header-cell *matHeaderCellDef></mat-header-cell>
-            <mat-cell *matCellDef="let element">
-              @if(isLoggedIn$|async){
-                <button mat-icon-button color="primary" (click)="editLoan(element)">
-                    <mat-icon>edit</mat-icon>
-                </button>
-                <button mat-icon-button color="accent" (click)="deleteLoan(element)">
-                    <mat-icon>clear</mat-icon>
-                </button>
-              }
-            </mat-cell>
-        </ng-container>
+        <mat-header-cell *matHeaderCellDef></mat-header-cell>
+        <mat-cell *matCellDef="let element">
+          @if(isLoggedIn$|async){
+          <button mat-icon-button color="primary" (click)="editLoan(element)">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button color="accent" (click)="deleteLoan(element)">
+            <mat-icon>clear</mat-icon>
+          </button>
+          }
+        </mat-cell>
+      </ng-container>
 
       <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></mat-header-row>
       <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
