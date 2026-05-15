@@ -27,6 +27,7 @@ import { SortPage } from '../../core/model/page/SortPage';
 import { editCreateDataModel } from '../../core/model/editCreateDataModel';
 import { MatDialog } from '@angular/material/dialog';
 import { LoanEditComponent } from '../loan-edit/loan-edit.component';
+import { DialogConfirmationComponent } from '../../core/dialog-confirmation/dialog-confirmation.component';
 
 
 @Component({
@@ -93,7 +94,7 @@ export class LoanListComponent implements OnInit {
   }
 
   ngOnInit(): void {
-   this.loanService.getCount().subscribe(count=>{
+   this.loanService.getLastId().subscribe(count=>{
     this.nextId.set(count+1);
    });
 
@@ -242,6 +243,29 @@ export class LoanListComponent implements OnInit {
   }
 
   deleteLoan(loan: Loan) {
+    const dialogRef = this.dialog.open(DialogConfirmationComponent, {
+                data: { title: "Eliminar Prestamo", description: "Atención si borra el préstamo se perderán sus datos.<br> ¿Desea eliminar el préstamo?" }
+              });
+
+              dialogRef.afterClosed().subscribe(result => {
+                if (result) {
+                  this.loanService.delete(loan.id).subscribe(
+                    {
+                      next: () => {
+                        this.ngOnInit();
+                      },
+                      error: (err) => {
+                        switch (err.status) {
+                          case 401: console.error('not valid token'); break;
+                          case 404: console.error('not found category'); break;
+                          case 409: console.error('Cant delete Category in use'); break;
+                          default: console.error('Default');
+                        }
+                      }
+                    }
+                  );
+                }
+              });
 
   }
 

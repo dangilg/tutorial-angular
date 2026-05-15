@@ -46,7 +46,11 @@ export class LoanService {
     return this.http.put<void>(url,dto);
   }
 
-  getCount():Observable<number>{
-    return this.http.get<number>(`${this.baseUrl}/count`)
+  getLastId():Observable<number>{
+    return this.http.get<number>(`${this.baseUrl}/lastId`)
+  }
+
+  delete(id:number):Observable<any>{
+    return this.http.delete(`${this.baseUrl}/${id}`);
   }
 }
