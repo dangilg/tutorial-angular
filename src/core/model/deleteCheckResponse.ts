@@ -1,4 +1,8 @@
 export interface DeleteCheckResponse{
   canDelete: boolean,
-  reason?: 'IN_USE' | 'PROTECTED' | ''
+  reason?: 'EN USO' | 'PROTEGIDA' | '',
+  list?:{
+    id:number,
+    name:string
+  }[]
 }

@@ -13,6 +13,8 @@ import { MatButtonModule } from '@angular/material/button';
 export class NotDeleteableComponent implements OnInit{
   reason:String;
   text:String ='';
+  list:{id:number,name:string}[] = []
+
   constructor(
    public dialogRef: MatDialogRef<NotDeleteableComponent>,
    @Inject(MAT_DIALOG_DATA) public data:DeleteCheckResponse,
@@ -21,9 +23,10 @@ export class NotDeleteableComponent implements OnInit{
   ngOnInit(){
     this.reason=this.data.reason;
     if(this.reason==''){
-      this.reason='NOT_KNOWN';
+      this.reason='DESCONOCIDO';
     }
     this.text=`NO SE PUEDE ELIMINAR DEBIDO A: ${this.reason}`
+    this.list = this.data.list;
   }
 
   onClose(){
