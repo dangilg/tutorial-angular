@@ -136,6 +136,8 @@ export class LoanEditComponent implements OnInit {
   });
 
 
+  originalValue:any;
+
   constructor(
     public dialogRef: MatDialogRef<LoanEditComponent>,
     @Inject(MAT_DIALOG_DATA) public data: editCreateDataModel<Loan>,
@@ -169,6 +171,8 @@ export class LoanEditComponent implements OnInit {
       endDate: this.loan.endDate ? moment(this.loan.endDate) : null
 
     }, { emitEvent: true });
+
+    this.originalValue = this.normalizeValue(this.form.value);
 
     this.gameService.getGames().subscribe(
       (games) => {
@@ -204,6 +208,24 @@ export class LoanEditComponent implements OnInit {
 
   }
 
+  normalizeValue(value:any){
+    return{
+      gameId: value.game?.id ?? null,
+      clientId: value.client.id ?? null,
+      startDate: value.startDate?.format('YYYY-MM-DD') ?? null,
+      endDate: value.endDate?.format('YYYY-MM-DD') ?? null
+    };
+  }
+
+  isUnchanged():boolean{
+    console.log('nuevo, original');
+    console.log(this.form.value);
+    console.log(this.originalValue);
+
+    const current = this.normalizeValue(this.form.value);
+    return JSON.stringify(current) === JSON.stringify(this.originalValue);
+  }
+
   onSave() {
     const formValue = this.form.value;
     this.loanService.saveLoan({
@@ -233,8 +255,7 @@ export class LoanEditComponent implements OnInit {
     this.form.updateValueAndValidity({emitEvent:true});
   }
   onFieldChange(formValue: typeof this.form.value) {
-    console.log('onFieldChange')
-    console.log(formValue);
+
 
     this.validateDates();
 
@@ -246,8 +267,7 @@ export class LoanEditComponent implements OnInit {
       endDate: formValue.endDate?.format('YYYY-MM-DD') ?? null
     }).subscribe(
       (data)=>{
-        console.log('me he suscrito');
-        console.log(data);
+
         this.clients = data.clients;
         this.games = data.games;
         this.validStartDates = data.validStartDates;

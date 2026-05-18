@@ -23,6 +23,8 @@ export class AuthorEditComponent implements OnInit {
     author: Author;
     editMode:boolean;
     id:number;
+    originalAuthor: Author;
+
     constructor(
         public dialogRef: MatDialogRef<AuthorEditComponent>,
         @Inject(MAT_DIALOG_DATA) public data: editCreateDataModel<Author>,
@@ -31,8 +33,14 @@ export class AuthorEditComponent implements OnInit {
 
     ngOnInit(): void {
         this.author = this.data.object ? Object.assign({}, this.data.object) : new Author();
+        this.originalAuthor = Object.assign({},this.author);
+
         this.id = this.data.id;
         this.editMode = this.data.editMode;
+    }
+
+    isUnchanged():boolean{
+      return JSON.stringify(this.author)=== JSON.stringify(this.originalAuthor);
     }
 
     onSave() {

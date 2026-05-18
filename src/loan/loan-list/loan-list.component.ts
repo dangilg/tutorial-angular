@@ -125,9 +125,9 @@ export class LoanListComponent implements OnInit {
       filters: filters
     }).subscribe(
       (data) => {
-        console.log(data);
+
         this.loansList.data = data.content;
-        console.log(this.loansList.data);
+
 
 
 
