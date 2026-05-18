@@ -25,7 +25,17 @@
 
     display: flex;
     flex-flow: wrap;
-    overflow: auto;
+    overflow: visible;
+
+    .logged{
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .logged:hover{
+      transform: scale(1.03);
+
+    }
+
   }
 
   .buttons {

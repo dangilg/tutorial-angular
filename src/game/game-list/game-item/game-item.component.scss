@@ -8,6 +8,7 @@
         display: flex;
         padding: 1rem;
 
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
         .photo {
             margin-right: 10px;
 
@@ -31,5 +32,16 @@
                 }
             }
         }
+    }
+
+    :host-context(.logged) mat-card:hover{
+      transform: scale(1.03);
+
+      border-radius: 12px;
+      box-shadow:
+        0 4px 10px rgba(0,0,0,0.15),
+        0 0 12px rgba(63,81,181,0.5);
+
+        cursor: pointer;
     }
 }

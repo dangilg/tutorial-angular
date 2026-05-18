@@ -142,4 +142,14 @@ export class GameListComponent implements OnInit {
       this.onSearch();
     });
   }
+
+  onCategoryChange(event:any){
+    this.filterCategory= event.value;
+    this.onSearch();
+  }
+
+  onTittleChange(value:string){
+    this.filterTitle=value;
+    this.onSearch();
+  }
 }
