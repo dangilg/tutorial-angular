@@ -97,28 +97,6 @@ export class LoanListComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    /*
-   this.loanService.getLastId().subscribe(count=>{
-    this.nextId.set(count+1);
-   });
-
-    this.clientService.getClients().subscribe(
-      clients => {
-        this.clients = clients;
-      }
-
-    )
-
-    this.gameServie.getGames().subscribe(
-      games => {
-        this.games = games;
-      }
-    )
-
-    this.getLoans();
-*/
-
-
     forkJoin({
       clients: this.clientService.getClients(),
       games: this.gameServie.getGames(),
@@ -291,4 +269,11 @@ export class LoanListComponent implements OnInit {
   }
 
 
+  isNotEditable(loan:Loan){
+    const endDate = moment(loan.endDate);
+    if(endDate.isBefore(moment(),'day')){
+      return true
+    }
+    return false;
+  }
 }

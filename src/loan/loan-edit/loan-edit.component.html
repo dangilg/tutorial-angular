@@ -1,3 +1,4 @@
+@if(isLoaded()){
 <div class="container">
   @if(editMode){
   <h1>Modificar Prestamo</h1>
@@ -84,6 +85,7 @@
     <button mat-stroked-button (click)="clean()">Limpiar</button>
     <button mat-stroked-button (click)="onClose()">Cerrar</button>
     <button mat-flat-button color="primary" (click)="onSave()"
-      [disabled]="isUnchanged()">Guardar</button>
+      [disabled]="isUnchangedOrNotFull()">Guardar</button>
   </div>
 </div>
+}

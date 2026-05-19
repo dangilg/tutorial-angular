@@ -77,7 +77,7 @@
         <mat-header-cell *matHeaderCellDef></mat-header-cell>
         <mat-cell *matCellDef="let element">
           @if(isLoggedIn$|async){
-          <button mat-icon-button color="primary" (click)="editLoan(element)">
+          <button mat-icon-button color="primary" (click)="editLoan(element)" [disabled]="isNotEditable(element)">
             <mat-icon>edit</mat-icon>
           </button>
           <button mat-icon-button color="accent" (click)="deleteLoan(element)">
@@ -94,7 +94,7 @@
     <mat-paginator (page)="getLoans($event)" [pageSizeOptions]="[5, 10, 20]" [pageIndex]="pageNumber"
       [pageSize]="pageSize" [length]="totalElements" showFirstLastButtons></mat-paginator>
 
-      ---
+
     @if(isLoggedIn$|async){
     <div class="buttons">
       <button mat-flat-button color="primary" (click)="createLoan()">Nuevo Prestamo</button>
