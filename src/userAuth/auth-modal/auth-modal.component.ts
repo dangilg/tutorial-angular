@@ -109,4 +109,13 @@ export class AuthModalComponent implements OnInit {
       }
     )
   }
+
+  onSubmit(){
+    if(this.mode===AuthMode.LOGIN){
+      this.logIn();
+    }
+    else{
+      this.signIn();
+    }
+  }
 }
