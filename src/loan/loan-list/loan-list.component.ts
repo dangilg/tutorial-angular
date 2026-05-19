@@ -29,6 +29,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { LoanEditComponent } from '../loan-edit/loan-edit.component';
 import { DialogConfirmationComponent } from '../../core/dialog-confirmation/dialog-confirmation.component';
 
+import { forkJoin } from 'rxjs';
 
 @Component({
   standalone: true,
@@ -56,24 +57,24 @@ import { DialogConfirmationComponent } from '../../core/dialog-confirmation/dial
 })
 export class LoanListComponent implements OnInit {
 
-  filterGame: Game = null;
-  filterClient: Client = null;
+  filterGameId: number = null;
+  filterClientId: number = null;
 
 
   filterDate: Moment = moment();
 
-  games: Game[];
-  clients: Client[];
+  games: Game[] = [];
+  clients: Client[] = [];
 
   loansList = new MatTableDataSource<Loan>();
   displayedColumns: string[] = ['id', 'game', 'client', 'startDate', 'endDate', 'action'];
 
   isLoggedIn$ = this.authService.isLoggedIn$;
 
-  pageNumber = signal(0);
+  pageNumber: number = 0;
   pageSize: number = 5;
 
-  totalElements = signal(0);
+  totalElements: number = 0;
 
   sort: SortPage = {
     property: 'id',
@@ -81,6 +82,8 @@ export class LoanListComponent implements OnInit {
   }
 
   nextId = signal<number>(-1);
+
+  isLoaded = signal(false);
 
   constructor(
     private authService: AuthService,
@@ -94,6 +97,7 @@ export class LoanListComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    /*
    this.loanService.getLastId().subscribe(count=>{
     this.nextId.set(count+1);
    });
@@ -112,8 +116,25 @@ export class LoanListComponent implements OnInit {
     )
 
     this.getLoans();
+*/
 
 
+    forkJoin({
+      clients: this.clientService.getClients(),
+      games: this.gameServie.getGames(),
+      lastId: this.loanService.getLastId()
+    }).subscribe(
+      ({ clients, games, lastId }) => {
+        this.clients = clients;
+        this.games = games;
+        this.nextId.set(lastId + 1);
+
+        this.getLoans();
+        console.log(this.isLoaded());
+        this.isLoaded.set(true);
+        console.log(this.isLoaded());
+      }
+    );
 
   }
 
@@ -141,9 +162,9 @@ export class LoanListComponent implements OnInit {
           this.getLoans(evt);
         }
         else {
-          this.pageNumber.set(data.pageable.pageNumber);
+          this.pageNumber = data.pageable.pageNumber;
           this.pageSize = data.pageable.pageSize;
-          this.totalElements.set(data.totalElements);
+          this.totalElements = data.totalElements;
         }
 
 
@@ -156,7 +177,7 @@ export class LoanListComponent implements OnInit {
 
   getPageable(event?: PageEvent): Pageable {
     const pageable: Pageable = {
-      pageNumber: this.pageNumber(),
+      pageNumber: this.pageNumber,
       pageSize: this.pageSize,
       sort: [
         {
@@ -176,8 +197,8 @@ export class LoanListComponent implements OnInit {
 
   getFilters(): FilterDataModel {
     return {
-      gameId: this.filterGame != null ? this.filterGame.id : null,
-      clientId: this.filterClient != null ? this.filterClient.id : null,
+      gameId: this.filterGameId != null ? this.filterGameId : null,
+      clientId: this.filterClientId != null ? this.filterClientId : null,
       date: this.filterDate != null ? this.filterDate.format('YYYY-MM-DD') : null
     };
   }
@@ -185,13 +206,13 @@ export class LoanListComponent implements OnInit {
 
 
   onCleanFilter(): void {
-    this.filterClient = null;
-    this.filterGame = null;
+    this.filterClientId = null;
+    this.filterGameId = null;
     this.filterDate = moment();
     this.getLoans({
       pageIndex: 0,
       pageSize: this.pageSize,
-      length: this.totalElements()
+      length: this.totalElements
     });
   }
 
@@ -199,7 +220,7 @@ export class LoanListComponent implements OnInit {
     this.getLoans({
       pageIndex: 0,
       pageSize: this.pageSize,
-      length: this.totalElements()
+      length: this.totalElements
     });
 
   }
@@ -244,28 +265,28 @@ export class LoanListComponent implements OnInit {
 
   deleteLoan(loan: Loan) {
     const dialogRef = this.dialog.open(DialogConfirmationComponent, {
-                data: { title: "Eliminar Prestamo", description: "Atención si borra el préstamo se perderán sus datos.<br> ¿Desea eliminar el préstamo?" }
-              });
+      data: { title: "Eliminar Prestamo", description: "Atención si borra el préstamo se perderán sus datos.<br> ¿Desea eliminar el préstamo?" }
+    });
 
-              dialogRef.afterClosed().subscribe(result => {
-                if (result) {
-                  this.loanService.delete(loan.id).subscribe(
-                    {
-                      next: () => {
-                        this.ngOnInit();
-                      },
-                      error: (err) => {
-                        switch (err.status) {
-                          case 401: console.error('not valid token'); break;
-                          case 404: console.error('not found category'); break;
-                          case 409: console.error('Cant delete Category in use'); break;
-                          default: console.error('Default');
-                        }
-                      }
-                    }
-                  );
-                }
-              });
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.loanService.delete(loan.id).subscribe(
+          {
+            next: () => {
+              this.ngOnInit();
+            },
+            error: (err) => {
+              switch (err.status) {
+                case 401: console.error('not valid token'); break;
+                case 404: console.error('not found category'); break;
+                case 409: console.error('Cant delete Category in use'); break;
+                default: console.error('Default');
+              }
+            }
+          }
+        );
+      }
+    });
 
   }
 
