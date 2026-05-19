@@ -211,7 +211,7 @@ export class LoanEditComponent implements OnInit {
   normalizeValue(value:any){
     return{
       gameId: value.game?.id ?? null,
-      clientId: value.client.id ?? null,
+      clientId: value.client?.id ?? null,
       startDate: value.startDate?.format('YYYY-MM-DD') ?? null,
       endDate: value.endDate?.format('YYYY-MM-DD') ?? null
     };
