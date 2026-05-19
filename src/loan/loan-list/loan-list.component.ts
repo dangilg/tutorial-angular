@@ -30,6 +30,7 @@ import { LoanEditComponent } from '../loan-edit/loan-edit.component';
 import { DialogConfirmationComponent } from '../../core/dialog-confirmation/dialog-confirmation.component';
 
 import { forkJoin } from 'rxjs';
+import { NotDeleteableComponent } from '../../core/notDeleteableComponent/notDeleteable.component';
 
 @Component({
   standalone: true,
@@ -242,36 +243,47 @@ export class LoanListComponent implements OnInit {
   }
 
   deleteLoan(loan: Loan) {
-    const dialogRef = this.dialog.open(DialogConfirmationComponent, {
-      data: { title: "Eliminar Prestamo", description: "Atención si borra el préstamo se perderán sus datos.<br> ¿Desea eliminar el préstamo?" }
-    });
+    const endDate = moment(loan.endDate);
+    const startDate = moment(loan.startDate);
+    if (moment().isBetween(startDate, endDate, 'day')) {
+      const dialogRef = this.dialog.open(NotDeleteableComponent, {
+        data: {
+          canDelete: false,
+          reason: 'EN PROCESO'
+        }
+      })
+    }
+    else {
+      const dialogRef = this.dialog.open(DialogConfirmationComponent, {
+        data: { title: "Eliminar Prestamo", description: "Atención si borra el préstamo se perderán sus datos.<br> ¿Desea eliminar el préstamo?" }
+      });
 
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.loanService.delete(loan.id).subscribe(
-          {
-            next: () => {
-              this.ngOnInit();
-            },
-            error: (err) => {
-              switch (err.status) {
-                case 401: console.error('not valid token'); break;
-                case 404: console.error('not found category'); break;
-                case 409: console.error('Cant delete Category in use'); break;
-                default: console.error('Default');
+      dialogRef.afterClosed().subscribe(result => {
+        if (result) {
+          this.loanService.delete(loan.id).subscribe(
+            {
+              next: () => {
+                this.ngOnInit();
+              },
+              error: (err) => {
+                switch (err.status) {
+                  case 401: console.error('not valid token'); break;
+                  case 404: console.error('not found category'); break;
+                  case 409: console.error('Cant delete Category in use'); break;
+                  default: console.error('Default');
+                }
               }
             }
-          }
-        );
-      }
-    });
-
+          );
+        }
+      });
+    }
   }
 
 
-  isNotEditable(loan:Loan){
+  isNotEditable(loan: Loan) {
     const endDate = moment(loan.endDate);
-    if(endDate.isBefore(moment(),'day')){
+    if (endDate.isBefore(moment(), 'day')) {
       return true
     }
     return false;
