@@ -208,39 +208,7 @@ export class LoanEditComponent implements OnInit {
       this.isLoaded.set(true);
     })
 
-    /*
-        this.gameService.getGames().subscribe(
-          (games) => {
-            this.games = games;
 
-            if (this.loan.game != null) {
-              const gameFilter: Game[] = games.filter(
-                (game) =>
-                  game.id == this.loan.game.id
-              );
-              if (gameFilter != null) {
-                this.loan.game = gameFilter[0];
-              }
-            }
-          }
-        );
-
-        this.clientservice.getClients().subscribe(
-          (clients) => {
-            this.clients = clients;
-
-            if (this.loan.client != null) {
-              const clientFilter: Client[] = clients.filter(
-                (client) =>
-                  client.id == this.loan.client.id
-              );
-              if (clientFilter != null) {
-                this.loan.client = clientFilter[0];
-              }
-            }
-          }
-        )
-    */
   }
 
   normalizeValue(value: any) {
@@ -273,11 +241,11 @@ export class LoanEditComponent implements OnInit {
       startDate: formValue.startDate?.format('YYYY-MM-DD') ?? null,
       endDate: formValue.endDate?.format('YYYY-MM-DD') ?? null
     }).subscribe();
-    this.dialogRef.close();
+    this.dialogRef.close(true);
   }
 
   onClose() {
-    this.dialogRef.close();
+    this.dialogRef.close(false);
   }
 
   clean() {
