@@ -82,9 +82,11 @@ export class LoanListComponent implements OnInit {
     direction: 'ASC'
   }
 
-  nextId = signal<number>(-1);
+
 
   isLoaded = signal(false);
+
+  nextId: number = -1;
 
   constructor(
     private authService: AuthService,
@@ -101,17 +103,17 @@ export class LoanListComponent implements OnInit {
     forkJoin({
       clients: this.clientService.getClients(),
       games: this.gameServie.getGames(),
-      lastId: this.loanService.getLastId()
+
     }).subscribe(
-      ({ clients, games, lastId }) => {
+      ({ clients, games}) => {
         this.clients = clients;
         this.games = games;
-        this.nextId.set(lastId + 1);
+
 
         this.getLoans();
-        console.log(this.isLoaded());
+        //console.log(this.isLoaded());
         this.isLoaded.set(true);
-        console.log(this.isLoaded());
+        //console.log(this.isLoaded());
       }
     );
 
@@ -214,20 +216,35 @@ export class LoanListComponent implements OnInit {
   }
 
   createLoan() {
-    const id: number = this.nextId();
-    this.openEditCreateModal(
+    this.loanService.getLastId().subscribe(
+      result=>{
+        const id = result+1;
+
+        if(id>this.nextId){
+          this.nextId = id;
+        }
+        else{
+          this.nextId+=1;
+        }
+
+
+        this.openEditCreateModal(
       {
         object: {
-          id: id,
+          id: this.nextId,
           game: null,
           client: null,
           startDate: '',
           endDate: ''
         },
-        id: id,
+        id: this.nextId,
         editMode: false
       }
     )
+      }
+    )
+
+
   }
 
   private openEditCreateModal(data: editCreateDataModel<Loan>) {
@@ -237,15 +254,33 @@ export class LoanListComponent implements OnInit {
     });
 
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
+      //console.log(result);
+      if(!result){
+        this.nextId-=1;
+      }
+      if(result &&!data.editMode){
+
+        if(this.loansList.data.length==this.pageSize){
+          console.log(this.pageNumber);
+          this.pageNumber+=1;
+          console.log(this.pageNumber);
+        }
+      }
+
       this.ngOnInit();
     });
+
+    // dialogRef.afterClosed().subscribe(result => {
+    //   this.ngOnInit();
+    // });
   }
 
   deleteLoan(loan: Loan) {
     const endDate = moment(loan.endDate);
     const startDate = moment(loan.startDate);
-    if (moment().isBetween(startDate, endDate, 'day')) {
+
+    if (moment().isBetween(startDate, endDate, 'day') ||moment().isSame(startDate,'day') || moment().isSame(endDate,'day')) {
       const dialogRef = this.dialog.open(NotDeleteableComponent, {
         data: {
           canDelete: false,
