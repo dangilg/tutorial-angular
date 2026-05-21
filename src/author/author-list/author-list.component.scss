@@ -1,40 +1,110 @@
-.container {
-    margin: 20px;
+:host{
+  display: flex;
+  flex:1;
+  min-height: 0;
+}
+.page {
+  display: flex;
+  flex-direction: column;
+  //height: 100%;
+  flex:1;
+  min-height: 0;
+  overflow: hidden;
+}
 
-    mat-table {
-        margin-top: 10px;
-        margin-bottom: 20px;
+/* HEADER */
+.page-header {
+  padding: 20px 20px 10px 20px;
 
-        .mat-header-row {
-            background-color:#f5f5f5;
+  h1 {
+    margin: 0;
+  }
+}
 
-            .mat-header-cell {
-                text-transform: uppercase;
-                font-weight: bold;
-                color: #838383;
-            }
-        }
+/* CONTENEDOR CENTRAL */
+.page-container {
+  flex: 1;
 
-        .mat-column-id {
-            flex: 0 0 30%;
-            justify-content: center;
-        }
+  min-height: 0;
 
-        .mat-column-name {
-            flex: 0 0 30%;
-            justify-content: center;
-        }
-        .mat-column-nationality {
-            flex: 0 0 30%;
-            justify-content: center;
-        }
-        .mat-column-action {
-            flex: 0 0 10%;
-            justify-content: center;
-        }
+  overflow: hidden;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+
+}
+
+/* WRAPPER tabla + paginator */
+.table-wrapper {
+  display: flex;
+  flex-direction: column;
+
+  //height: 100%;
+
+  flex:1;
+  min-height: 0;
+
+  overflow: hidden;
+
+  max-width: 1200px;
+  width:100%;
+  margin: 0 auto;
+
+}
+
+/* SOLO AQUÍ hay scroll */
+.table-scroll {
+  flex: 1;
+  overflow-y: auto;
+
+  min-height: 0;
+}
+
+/* tabla */
+mat-table {
+  width: 100%;
+
+  .mat-header-row {
+    background-color: #f5f5f5;
+
+    .mat-header-cell {
+      text-transform: uppercase;
+      font-weight: bold;
+      color: #838383;
     }
+  }
 
-    .buttons {
-        text-align: right;
-    }
+  .mat-column-id {
+    flex: 0 0 30%;
+    justify-content: center;
+  }
+
+  .mat-column-name {
+    flex: 0 0 30%;
+    justify-content: center;
+  }
+
+  .mat-column-nationality {
+    flex: 0 0 30%;
+    justify-content: center;
+  }
+
+  .mat-column-action {
+    flex: 0 0 10%;
+    justify-content: center;
+  }
+}
+
+/* paginator SIEMPRE visible */
+mat-paginator {
+  flex-shrink: 0;
+}
+
+/* footer */
+.page-footer {
+  padding: 10px 20px;
+  display: flex;
+  justify-content: flex-end;
+
+  margin-top:auto;
 }
