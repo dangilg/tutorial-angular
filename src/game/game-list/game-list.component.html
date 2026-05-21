@@ -1,51 +1,57 @@
-<div class="container">
-  <h1>Catálogo de juegos</h1>
-  <br>
-  <div class="filters">
-    <form>
-      <mat-form-field>
-        <mat-label>Título del juego</mat-label>
-        <input class="filterInput" type="text" matInput placeholder="Título del juego" [(ngModel)]="filterTitle"
-          name="title"
-          (ngModelChange)="onTittleChange($event)"/>
-      </mat-form-field>
+<div class="page">
 
-      <mat-form-field>
-        <mat-label>Categoría del juego</mat-label>
-        <mat-select class="filterInput" disableRipple [(ngModel)]="filterCategory" name="category"
-        (selectionChange)="onCategoryChange($event)"
-        >
-          @for (category of categories; track category.id) {
-          <mat-option [value]="category">{{ category.name }}</mat-option>
-          }
-        </mat-select>
-      </mat-form-field>
-    </form>
+  <div class="page-header">
+    <h1>Catálogo de juegos</h1>
 
-    <div class="buttons">
-      <button mat-stroked-button (click)="onCleanFilter()">Limpiar</button>
-      <button mat-stroked-button (click)="onSearch()">Filtrar</button>
+    <div class="filters">
+      <form>
+        <mat-form-field>
+          <mat-label>Título del juego</mat-label>
+          <input class="filterInput" type="text" matInput placeholder="Título del juego" [(ngModel)]="filterTitle"
+            name="title" (ngModelChange)="onTittleChange($event)" />
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Categoría del juego</mat-label>
+          <mat-select class="filterInput" disableRipple [(ngModel)]="filterCategory" name="category"
+            (selectionChange)="onCategoryChange($event)">
+            @for (category of categories; track category.id) {
+            <mat-option [value]="category">{{ category.name }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      </form>
+
+      <div class="filter-buttons">
+        <button mat-stroked-button (click)="onCleanFilter()">Limpiar</button>
+        <button mat-stroked-button (click)="onSearch()">Filtrar</button>
+      </div>
     </div>
   </div>
 
-  <div class="game-list">
-    @for (game of games(); track game.id) {
-      <div [class.logged] = "(isLoggedIn$ | async)">
-        @if(isLoggedIn$|async){
-        <app-game-item (click)="editGame(game)" [game]="game" />
-      }
-      @else {
-        <app-game-item [game]="game" />
-      }
+  <div class="page-container">
+    <div class="content-wrapper">
+      <div class="game-list">
+        @for (game of games(); track game.id) {
+        <div [class.logged]="(isLoggedIn$ | async)">
+          @if(isLoggedIn$|async){
+          <app-game-item (click)="editGame(game)" [game]="game" />
+          }
+          @else {
+          <app-game-item [game]="game" />
+          }
+        </div>
+        }
       </div>
-    }
+    </div>
   </div>
 
-  <div class="buttons">
-    @if(isLoggedIn$|async){
-      <button mat-flat-button color="primary" (click)="createGame()">
-        Nuevo juego
-      </button>
-    }
+
+  @if(isLoggedIn$|async){
+  <div class="page-footer">
+    <button mat-flat-button color="primary" (click)="createGame()">
+      Nuevo juego
+    </button>
   </div>
+  }
 </div>

@@ -1,51 +1,96 @@
-.container {
-  margin: 20px;
+:host {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+.page {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.page-header {
+  padding: 20px 20px 10px 20px;
+
+
+
+  h1 {
+    margin: 0 0 30px 0;
+  }
 
   .filters {
     display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+
+    gap: 20px;
+
+    form {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
 
     mat-form-field {
-      width: 300px;
-      margin-right: 20px;
+      width: 260px;
     }
 
-    .buttons {
-      flex: auto;
-      align-self: center;
-
-      button {
-        margin-left: 15px;
-      }
+    .filter-buttons {
+      margin-left: auto;
+      display: flex;
+      gap: 10px;
+      align-items: center;
     }
-  }
-
-  .game-list {
-    margin-top: 20px;
-    margin-bottom: 20px;
-
-    display: flex;
-    flex-flow: wrap;
-    overflow: visible;
-
-    .logged{
-      cursor: pointer;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-    .logged:hover{
-      transform: scale(1.03);
-
-    }
-
-  }
-
-  .buttons {
-    text-align: right;
   }
 }
 
+.page-container {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
 
+.content-wrapper {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.game-list {
+  height: 100%;
+  overflow-y: auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+
+  align-content: flex-start;
+
+  .logged {
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .logged:hover {
+    transform: scale(1.03);
+  }
+}
+
+.page-footer {
+  padding: 10px 20px;
+  display: flex;
+  justify-content: flex-end;
+  margin-top: auto;
+}
 
 button {
   min-width: 125px;
-  width: auto;
 }
