@@ -1,77 +1,135 @@
-.container {
-  margin: 20px;
-
-  .filters {
-    display:flex;
-
-    mat-form-field {
-      width: 255;
-      margin-right: 20px;
-    }
-
-    .filterButtons {
-
-      display: flex;
-      flex-direction: column;
-      align-self: center;
-      gap: 0.75rem;
-      margin-left: auto;
-    }
-  }
-
-  .loan-list {
-    margin-top: 20px;
-    margin-bottom: 20px;
-
-    mat-table {
-        margin-top: 10px;
-        margin-bottom: 20px;
-
-        .mat-header-row {
-            background-color:#f5f5f5;
-
-            .mat-header-cell {
-                text-transform: uppercase;
-                font-weight: bold;
-                color: #838383;
-            }
-        }
-
-        .mat-column-id {
-            flex: 0 0 18%;
-            justify-content: center;
-        }
-
-        .mat-column-game {
-            flex: 0 0 18%;
-            justify-content: center;
-        }
-        .mat-column-client {
-            flex: 0 0 18%;
-            justify-content: center;
-        }
-        .mat-column-startDate {
-            flex: 0 0 18%;
-            justify-content: center;
-        }
-        .mat-column-endDate {
-            flex: 0 0 18%;
-            justify-content: center;
-        }
-        .mat-column-action {
-            flex: 0 0 10%;
-            justify-content: center;
-        }
-    }
-  }
-
-  .buttons {
-    text-align: right;
-  }
+:host {
+  display: flex;
+  flex: 1;
+  min-height: 0;
 }
 
 
+.page {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
 
+.page-header {
+  padding: 20px 20px 10px 20px;
 
+  h1 {
+    margin: 0 0 20px 0;
+  }
 
+  .filters {
+    display: flex;
+    align-items: flex-end;
+    gap: 20px;
 
+    .formFilters {
+      flex: 1;
+
+      form {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+      }
+
+      mat-form-field {
+        width: 260px;
+        margin-bottom: 0;
+      }
+      mat-form-field:last-child{
+        width: 300px;
+      }
+    }
+
+    .filterButtons {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+  }
+}
+
+.page-container {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.table-wrapper {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.table-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+mat-table {
+  width: 100%;
+
+  .mat-header-row {
+    background-color: #f5f5f5;
+
+    .mat-header-cell {
+      text-transform: uppercase;
+      font-weight: bold;
+      color: #838383;
+    }
+  }
+
+  .mat-column-id {
+    flex: 0 0 18%;
+    justify-content: center;
+  }
+
+  .mat-column-game {
+    flex: 0 0 18%;
+    justify-content: center;
+  }
+
+  .mat-column-client {
+    flex: 0 0 18%;
+    justify-content: center;
+  }
+
+  .mat-column-startDate {
+    flex: 0 0 18%;
+    justify-content: center;
+  }
+
+  .mat-column-endDate {
+    flex: 0 0 18%;
+    justify-content: center;
+  }
+
+  .mat-column-action {
+    flex: 0 0 10%;
+    justify-content: center;
+  }
+}
+
+mat-paginator{
+  flex-shrink: 0;
+}
+
+.page-footer{
+  padding: 10px 20px;
+  display: flex;
+  justify-content: flex-end;
+  margin-top: auto;
+}
