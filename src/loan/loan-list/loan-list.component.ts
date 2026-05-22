@@ -122,6 +122,7 @@ export class LoanListComponent implements OnInit {
   getLoans(event?: PageEvent) {
     const pageable: Pageable = this.getPageable(event);
     const filters: FilterDataModel = this.getFilters();
+
     this.loanService.getLoans({
       pageable: pageable,
       filters: filters
@@ -130,8 +131,10 @@ export class LoanListComponent implements OnInit {
 
         this.loansList.data = data.content;
 
-
-
+        //para evitar el error de renderizado q ocurre cuando data.content está vacío
+        if(this.loansList.data.length==0){
+          this.isLoaded.set(false);
+        }
 
         if (this.loansList.data.length == 0 && pageable.pageNumber != 0) {
           const evt: PageEvent = {
@@ -148,9 +151,7 @@ export class LoanListComponent implements OnInit {
           this.totalElements = data.totalElements;
         }
 
-
-
-
+        this.isLoaded.set(true);
       }
     );
 
