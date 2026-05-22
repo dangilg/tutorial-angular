@@ -111,5 +111,7 @@ For more information on using the Angular CLI, including detailed command refere
   - A la hora de **Editar** un préstamo, este no se toma en cuenta para aplicar los filtros dinámicos.
 
 
+### Otros
 
+-Implementación de un **interceptor** para añadir el token (*JWT*) en todas la cabecera de todas las peticiones salientes.<br>[Interceptor](./src/core/service/jwtInterceptor.service.ts)
 
