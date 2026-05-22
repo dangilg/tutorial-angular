@@ -19,8 +19,8 @@
 
         <mat-form-field>
             <mat-label>Edad recomendada</mat-label>
-            <input type="number" matInput placeholder="Edad recomendada" [(ngModel)]="game.age" min="1" name="age" required >
-            <mat-error>La edad no puede estar vacía ni ser menor a 1</mat-error>
+            <input type="number" matInput placeholder="Edad recomendada" [(ngModel)]="game.age" min="1" max="99" name="age" required >
+            <mat-error>La edad no puede estar vacía o no estar entre [1-99]</mat-error>
         </mat-form-field>
 
         <mat-form-field>
