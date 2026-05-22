@@ -61,10 +61,55 @@ For more information on using the Angular CLI, including detailed command refere
 ---
 ## Modificaciones respecto al Tutorial
 
-En el modal de editarCategoria, a la hora de crear una nueva categoria, mantenemos el input de id como disable, pero en el placeholder indicamos el id que será
-(id de la última categoría + 1)
+### General
 
-A la hora de hacer un LogIn o un Register, usamos el mismo MatDialog para mantener componentes reutilizables, pasando por la option Data de MatDialog el tipo q es. El MatDialog solo puede ser de los tipos que pertenezcan al Enum AuthMode
+- Implementación de un id orientativo para mejorar el UX a la hora de crear un nuevo Elemento.
+- Creación de un botón Registrarse, abriendo la posibilidad a crear más usuarios. Esto viene con una validación de que no  **No Existan** usuarios con nombres iguales.
+- El logo y el nombre de la página también se muestran el la pestaña del navegador.
+- En **Todas** las *pages* se ha aplicado el siguiente diseño:
+  - ***Header*** con el nombre de la *page* y los filtros en caso de que existan.
+  - ***Container*** con la tabla.
+    - En caso de overflow vertical, **solo** la tabla tendrá scroll.
+    - En caso de ser una *page* paginada, el *mat-paginator* se mantiene el final de la tabla, sin importar la cantidad de elementos.
+  - ***Footer*** con el botón *create*. Solo visible manteniendo el diseño original (Cuando el usuario ha iniciado sesión de manera exitosa)
+- El **Header** global, revisa cada vez que se recarga si el token ha expirado o no. En caso de *token no válido* muestra un mensaje al usuario y cierra la sesión de este.
+- Tras la verificación de borrado de un elemento según el diseño, se muestra al usuario un mensaje con el motivo (*En Uso*, *Protegido*,...) y la lista de **Entidades** en las que está *En Uso* si es es el caso.
+- Los modales de **Editar** deshabilitan el botón de **Guardar** si los datos introducidos son iguales a los que tenía el *Elemento* antes de editarlo.
+- El botón **Cerrar sesión** del *Header* muestra un mensaje de confirmación antes de cerrar la sesión.
+### Categorias
 
-Prestamos:
-Eliminamos el mensaje de error al guardad en el caso de que las fechas del préstamo superen el periodo máximo (14 días) ya que aplicamos un filtro en el DatePicker de Devolución, así como la detección de cambios en el DatePicker de Préstamos que detecta si se supera el periodo máximo y restablece a null el DatePicker de Devolución
+- Ninguna modificación extra a las anteriores mencionadas.
+
+### Autores
+
+- A la hora de **Eliminar** un *Autor* válido, si con esto quedase una página con lista vacía, pide al *backend* la página anterior y la muestra.
+- A la hora de **Crear** un *Autor*, si con esto se sobrepasa el límite de elementos de la página, pide al *backend* la página siguiente y la muestra. 
+
+### Clientes
+
+- Ninguna modificación extra a las anteriores mencionadas.
+
+### Catálogo
+
+- Los filtros se ejecutan de forma dinámica. Mantenemos el botón filtrar por mantener el diseño original del Layour
+- Cuando el usuario ha **iniciado sesión**, los *Juegos* muestran un **Glow** al pasar el ratón por encima de ellos, indicando al usuario el *Juego* que va a editar.
+
+### Préstamos
+
+- Mismas modificaciones respecto a la lista páginada que en **Autores**.
+- Filtros estáticos.
+- Por defecto, el filtro de la **Fecha** muestra la fecha de hoy. Implementa un botón para borrarla.
+- El filtro de la **Fecha** solo permite su uso mediante *DatePickerToggle*.
+- El botón **Filtrar** pone los campos de los filtros en *Default*.
+- El botón **Editar** está deshabilitado para los *Préstamos* que ya han finalizado.
+- Solo se pueden **Borrar** los *Préstamos* que no estén en proceso.
+- La lista se ordena por *Fecha de inicio del préstamo* en orden ascendente.
+- A la hora de **Crear** o **Editar** un préstamo:
+  - Se han eliminado los *mensajes de error* y se han sustituido por *filtros dinámicos*, que solo permiten esoger al usuario los datos válidos según los que va teniendo el formulario. Esto no elimina la comprobación de las restricciones en el *backend*.
+  - La **Fecha de inicio del préstamo** no puede ser anterior a hoy. Está puesto un límite desde el *backend* de **60 días** desde la fecha de hoy para el rango de *fechas válidas de inico del préstamo*
+  - La selección de **Fecha de fin del préstamos** está deshabilitada hasta que se seleccione una *Fecha de inicio del préstamo*.
+  - A la hora de **Editar** un préstamo, este no se toma en cuenta para aplicar los filtros dinámicos.
+
+
+
+
