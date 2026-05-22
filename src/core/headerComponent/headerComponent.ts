@@ -8,6 +8,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { AuthModalComponent } from '../../userAuth/auth-modal/auth-modal.component';
 import { AuthService } from '../service/auth.service';
 import { AuthMode } from '../../userAuth/model/AuthMode';
+import { LogOutComponent } from '../../userAuth/logOutModal/logOutComponent';
+import { LogOutMode } from '../../userAuth/logOutModal/model/LogOutMode';
 
 
 @Component({
@@ -21,7 +23,7 @@ import { AuthMode } from '../../userAuth/model/AuthMode';
   templateUrl: './headerComponent.html',
   styleUrl: './headerComponent.scss',
 })
-export class HeaderComponent implements OnInit{
+export class HeaderComponent implements OnInit {
   title = 'tutorial Angular';
 
   isLoggedIn$ = this.authService.isLoggedIn$;
@@ -34,33 +36,49 @@ export class HeaderComponent implements OnInit{
 
   ngOnInit(): void {
     //console.log('init header')
-    this.authService.isTokenValid().subscribe(
-      isValid=>{
-        if(!isValid){
-          this.logOut()
+
+    if (this.authService.getToken()) {
+      this.authService.isTokenValid().subscribe(
+        isValid => {
+          if (!isValid) {
+            //se puede modificar con un mensaje
+            const dialogRef = this.dialog.open(LogOutComponent, {
+              data: {
+                modo: LogOutMode.AUTO,
+                mensaje: 'el token ha expirado'
+              }
+
+            })
+          }
         }
-      }
-    )
+      )
+    }
   }
   openSignInModal() {
     const dialogRef = this.dialog.open(AuthModalComponent, {
       disableClose: true,
-      data:{mode:AuthMode.SIGNIN}
+      data: { mode: AuthMode.SIGNIN }
     });
 
   }
 
   openLogInModal() {
-    const dialogRef = this.dialog.open(AuthModalComponent,{
-      disableClose:true,
-      data:{
-        mode:AuthMode.LOGIN
+    const dialogRef = this.dialog.open(AuthModalComponent, {
+      disableClose: true,
+      data: {
+        mode: AuthMode.LOGIN
       }
     })
   }
 
   logOut() {
-    this.authService.logOut();
+    const dialogRef = this.dialog.open(LogOutComponent, {
+      data: {
+        modo: LogOutMode.MANUAL,
+        mensaje: 'Va a cerrar sesión. ¿Está seguro?'
+      }
+    })
+
   }
 
 }

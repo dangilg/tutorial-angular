@@ -36,6 +36,8 @@ export class GameEditComponent implements OnInit {
 
   id:number;
 
+  originalGame:Game;
+
   constructor(
     public dialogRef: MatDialogRef<GameEditComponent>,
     @Inject(MAT_DIALOG_DATA) public data: editCreateDataModel<Game>,
@@ -46,6 +48,9 @@ export class GameEditComponent implements OnInit {
 
   ngOnInit(): void {
     this.game = this.data.object ? { ...this.data.object } : new Game();
+
+    this.originalGame = JSON.parse(JSON.stringify(this.game));
+
     this.editMode = this.data.editMode;
     this.id = this.data.id;
     //this.game = this.data.game ? Object.assign({}, this.data.game) : new Game();
@@ -77,6 +82,14 @@ export class GameEditComponent implements OnInit {
     });
   }
 
+  isUnchanged():boolean{
+    return(
+      this.game.title === this.originalGame.title &&
+      Number(this.game.age) === Number(this.originalGame.age) &&
+      this.game.category?.id === this.originalGame.category?.id &&
+      this.game.author?.id === this.originalGame.author?.id
+    );
+  }
   onSave() {
     if (!this.editMode) {
       this.game.id = null;

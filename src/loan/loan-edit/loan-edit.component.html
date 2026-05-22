@@ -1,3 +1,4 @@
+@if(isLoaded()){
 <div class="container">
   @if(editMode){
   <h1>Modificar Prestamo</h1>
@@ -13,7 +14,7 @@
 
     <mat-form-field>
       <mat-label>Nombre del juego</mat-label>
-      <mat-select class="filterInput" disableRipple  required
+      <mat-select class="filterInput" disableRipple
       formControlName="game" [compareWith]="compareById">
         @for(game of games; track game.id){
         <mat-option [value]="game">{{game.title}}</mat-option>
@@ -23,7 +24,7 @@
 
     <mat-form-field>
       <mat-label>Nombre del cliente</mat-label>
-      <mat-select class="filterInput" disableRipple required
+      <mat-select class="filterInput" disableRipple
       formControlName="client" [compareWith]="compareById">
         @for(client of clients; track client.id){
         <mat-option [value]="client">{{client.name}}</mat-option>
@@ -84,6 +85,7 @@
     <button mat-stroked-button (click)="clean()">Limpiar</button>
     <button mat-stroked-button (click)="onClose()">Cerrar</button>
     <button mat-flat-button color="primary" (click)="onSave()"
-      [disabled]="form.invalid || form.pristine">Guardar</button>
+      [disabled]="isUnchangedOrNotFull()">Guardar</button>
   </div>
 </div>
+}

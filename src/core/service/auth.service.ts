@@ -30,6 +30,7 @@ export class AuthService {
   }
 
   getToken(): string | null {
+
     return sessionStorage.getItem(this.TOKEN);
   }
 

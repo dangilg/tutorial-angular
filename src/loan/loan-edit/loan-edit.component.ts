@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, Inject, OnInit, signal } from '@angular/core';
 import { Loan } from '../model/Loan';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -13,12 +13,12 @@ import { LoanService } from '../service/loan.service';
 import { ClientService } from '../../client/service/client.service';
 import { GameService } from '../../game/service/game.service';
 import { MatSelectModule } from '@angular/material/select';
-import { MatDatepickerInput, MatDatepickerModule, MatDatepickerToggle } from "@angular/material/datepicker";
+import { MatDatepickerModule } from "@angular/material/datepicker";
 import moment, { Moment } from 'moment';
 import { MatMomentDateModule } from '@angular/material-moment-adapter';
 import { CommonModule } from '@angular/common';
 import { Interval } from '../model/available/Interval';
-import { interval, range } from 'rxjs';
+import { forkJoin } from 'rxjs';
 
 
 @Component({
@@ -42,11 +42,14 @@ export class LoanEditComponent implements OnInit {
   loan: Loan;
   editMode: boolean;
 
-  validStartDates:Interval[]=null;
-  validEndDates:Interval[]=null;
+  validStartDates: Interval[] = null;
+  validEndDates: Interval[] = null;
 
   games: Game[];
   clients: Client[];
+
+  isLoaded = signal(false);
+
 
   startDateFilter = (date: Moment | null): boolean => {
 
@@ -58,11 +61,11 @@ export class LoanEditComponent implements OnInit {
 
     if (date.isBefore(moment(), 'day')) return false;
 
-    if(!this.validStartDates || this.validStartDates.length===0){
+    if (!this.validStartDates || this.validStartDates.length === 0) {
       return true
     }
 
-    return this.validStartDates.some(interval =>{
+    return this.validStartDates.some(interval => {
       const start = moment(interval.start).startOf('day');
       const end = moment(interval.end).startOf('day');
 
@@ -82,11 +85,11 @@ export class LoanEditComponent implements OnInit {
     const min = this.startDate.clone();
     const max = this.startDate.clone().add(13, 'days');
 
-    if(!(day.isSameOrAfter(min,'day') && day.isSameOrBefore(max,'day'))){
+    if (!(day.isSameOrAfter(min, 'day') && day.isSameOrBefore(max, 'day'))) {
       return false;
     }
 
-    if(!this.validEndDates || this.validEndDates.length === 0){
+    if (!this.validEndDates || this.validEndDates.length === 0) {
       return true;
     }
 
@@ -136,12 +139,15 @@ export class LoanEditComponent implements OnInit {
   });
 
 
+  originalValue: any;
+
   constructor(
     public dialogRef: MatDialogRef<LoanEditComponent>,
     @Inject(MAT_DIALOG_DATA) public data: editCreateDataModel<Loan>,
     private loanService: LoanService,
     private clientservice: ClientService,
-    private gameService: GameService
+    private gameService: GameService,
+    private cdr: ChangeDetectorRef
   ) { }
 
   ngOnInit(): void {
@@ -170,90 +176,114 @@ export class LoanEditComponent implements OnInit {
 
     }, { emitEvent: true });
 
-    this.gameService.getGames().subscribe(
-      (games) => {
-        this.games = games;
+    this.originalValue = this.normalizeValue(this.form.value);
 
-        if (this.loan.game != null) {
-          const gameFilter: Game[] = games.filter(
-            (game) =>
-              game.id == this.loan.game.id
-          );
-          if (gameFilter != null) {
-            this.loan.game = gameFilter[0];
-          }
-        }
+    forkJoin({
+      games: this.gameService.getGames(),
+      clients: this.clientservice.getClients()
+    }).subscribe(({ games, clients }) => {
+      this.games = games;
+      this.clients = clients;
+
+      if (this.loan.game) {
+        this.loan.game = games.find(
+          g => g.id === this.loan.game.id
+        ) ?? null;
+        this.form.patchValue({
+          game: this.loan.game
+        },
+          { emitEvent: false });
       }
-    );
 
-    this.clientservice.getClients().subscribe(
-      (clients) => {
-        this.clients = clients;
-
-        if (this.loan.client != null) {
-          const clientFilter: Client[] = clients.filter(
-            (client) =>
-              client.id == this.loan.client.id
-          );
-          if (clientFilter != null) {
-            this.loan.client = clientFilter[0];
-          }
-        }
+      if (this.loan.client) {
+        this.loan.client = clients.find(
+          c => c.id === this.loan.client.id
+        ) ?? null;
+        this.form.patchValue({
+          client: this.loan.client
+        },
+          { emitEvent: false });
       }
-    )
 
+      this.isLoaded.set(true);
+    })
+
+
+  }
+
+  normalizeValue(value: any) {
+    return {
+      gameId: value.game?.id ?? null,
+      clientId: value.client?.id ?? null,
+      startDate: value.startDate?.format('YYYY-MM-DD') ?? null,
+      endDate: value.endDate?.format('YYYY-MM-DD') ?? null
+    };
+  }
+
+  isUnchangedOrNotFull(): boolean {
+    const current = this.normalizeValue(this.form.value);
+    if(current.clientId == null ||
+      current.gameId==null ||
+      current.startDate == null ||
+      current.endDate == null
+    ){
+      return true;
+    }
+    return JSON.stringify(current) === JSON.stringify(this.originalValue);
   }
 
   onSave() {
     const formValue = this.form.value;
     this.loanService.saveLoan({
-      loanId: this.data.editMode ?this.data.id : null,
+      loanId: this.data.editMode ? this.data.id : null,
       clientId: formValue.client?.id ?? null,
       gameId: formValue.game?.id ?? null,
       startDate: formValue.startDate?.format('YYYY-MM-DD') ?? null,
       endDate: formValue.endDate?.format('YYYY-MM-DD') ?? null
     }).subscribe();
-    this.dialogRef.close();
+    this.dialogRef.close(true);
   }
 
   onClose() {
-    this.dialogRef.close();
+    this.dialogRef.close(false);
   }
 
-  clean(){
+  clean() {
     this.form.patchValue({
-      game:null,
-      client:null,
-      startDate:null,
-      endDate:null
-    },{
-      emitEvent:false
+      game: null,
+      client: null,
+      startDate: null,
+      endDate: null
+    }, {
+      emitEvent: false
     })
 
-    this.form.updateValueAndValidity({emitEvent:true});
+    this.form.updateValueAndValidity({ emitEvent: true });
   }
   onFieldChange(formValue: typeof this.form.value) {
-    console.log('onFieldChange')
-    console.log(formValue);
+
+    //this.isLoaded.set(false);
 
     this.validateDates();
 
     this.loanService.getAvailables({
-      loanId: this.data.editMode ?this.data.id : null,
+      loanId: this.data.editMode ? this.data.id : null,
       clientId: formValue.client?.id ?? null,
       gameId: formValue.game?.id ?? null,
       startDate: formValue.startDate?.format('YYYY-MM-DD') ?? null,
       endDate: formValue.endDate?.format('YYYY-MM-DD') ?? null
     }).subscribe(
-      (data)=>{
-        console.log('me he suscrito');
-        console.log(data);
-        this.clients = data.clients;
-        this.games = data.games;
-        this.validStartDates = data.validStartDates;
-        this.validEndDates = data.validEndDates;
+      (data) => {
+
+          this.clients = [...data.clients];
+          this.games = [...data.games];
+          this.validStartDates = data.validStartDates;
+          this.validEndDates = data.validEndDates;
+
+          //this.isLoaded.set(true);
+          this.cdr.detectChanges();
       }
-    )
+    );
 
 
   }
@@ -272,9 +302,9 @@ export class LoanEditComponent implements OnInit {
     }
   }
 
-  compareById = (element1:any, element2:any):boolean=>{
+  compareById = (element1: any, element2: any): boolean => {
 
-    return element1 && element2 ? element1.id === element2.id : element1===element2;
+    return element1 && element2 ? element1.id === element2.id : element1 === element2;
   };
 
 

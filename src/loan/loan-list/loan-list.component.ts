@@ -29,6 +29,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { LoanEditComponent } from '../loan-edit/loan-edit.component';
 import { DialogConfirmationComponent } from '../../core/dialog-confirmation/dialog-confirmation.component';
 
+import { forkJoin } from 'rxjs';
+import { NotDeleteableComponent } from '../../core/notDeleteableComponent/notDeleteable.component';
 
 @Component({
   standalone: true,
@@ -56,31 +58,35 @@ import { DialogConfirmationComponent } from '../../core/dialog-confirmation/dial
 })
 export class LoanListComponent implements OnInit {
 
-  filterGame: Game = null;
-  filterClient: Client = null;
+  filterGameId: number = null;
+  filterClientId: number = null;
 
 
   filterDate: Moment = moment();
 
-  games: Game[];
-  clients: Client[];
+  games: Game[] = [];
+  clients: Client[] = [];
 
   loansList = new MatTableDataSource<Loan>();
   displayedColumns: string[] = ['id', 'game', 'client', 'startDate', 'endDate', 'action'];
 
   isLoggedIn$ = this.authService.isLoggedIn$;
 
-  pageNumber = signal(0);
+  pageNumber: number = 0;
   pageSize: number = 5;
 
-  totalElements = signal(0);
+  totalElements: number = 0;
 
   sort: SortPage = {
     property: 'id',
     direction: 'ASC'
   }
 
-  nextId = signal<number>(-1);
+
+
+  isLoaded = signal(false);
+
+  nextId: number = -1;
 
   constructor(
     private authService: AuthService,
@@ -94,42 +100,41 @@ export class LoanListComponent implements OnInit {
   }
 
   ngOnInit(): void {
-   this.loanService.getLastId().subscribe(count=>{
-    this.nextId.set(count+1);
-   });
+    forkJoin({
+      clients: this.clientService.getClients(),
+      games: this.gameServie.getGames(),
 
-    this.clientService.getClients().subscribe(
-      clients => {
+    }).subscribe(
+      ({ clients, games}) => {
         this.clients = clients;
-      }
-
-    )
-
-    this.gameServie.getGames().subscribe(
-      games => {
         this.games = games;
+
+
+        this.getLoans();
+        //console.log(this.isLoaded());
+        this.isLoaded.set(true);
+        //console.log(this.isLoaded());
       }
-    )
-
-    this.getLoans();
-
-
+    );
 
   }
 
   getLoans(event?: PageEvent) {
     const pageable: Pageable = this.getPageable(event);
     const filters: FilterDataModel = this.getFilters();
+
     this.loanService.getLoans({
       pageable: pageable,
       filters: filters
     }).subscribe(
       (data) => {
-        console.log(data);
+
         this.loansList.data = data.content;
-        console.log(this.loansList.data);
 
-
+        //para evitar el error de renderizado q ocurre cuando data.content está vacío
+        if(this.loansList.data.length==0){
+          this.isLoaded.set(false);
+        }
 
         if (this.loansList.data.length == 0 && pageable.pageNumber != 0) {
           const evt: PageEvent = {
@@ -141,14 +146,12 @@ export class LoanListComponent implements OnInit {
           this.getLoans(evt);
         }
         else {
-          this.pageNumber.set(data.pageable.pageNumber);
+          this.pageNumber = data.pageable.pageNumber;
           this.pageSize = data.pageable.pageSize;
-          this.totalElements.set(data.totalElements);
+          this.totalElements = data.totalElements;
         }
 
-
-
-
+        this.isLoaded.set(true);
       }
     );
 
@@ -156,7 +159,7 @@ export class LoanListComponent implements OnInit {
 
   getPageable(event?: PageEvent): Pageable {
     const pageable: Pageable = {
-      pageNumber: this.pageNumber(),
+      pageNumber: this.pageNumber,
       pageSize: this.pageSize,
       sort: [
         {
@@ -176,8 +179,8 @@ export class LoanListComponent implements OnInit {
 
   getFilters(): FilterDataModel {
     return {
-      gameId: this.filterGame != null ? this.filterGame.id : null,
-      clientId: this.filterClient != null ? this.filterClient.id : null,
+      gameId: this.filterGameId != null ? this.filterGameId : null,
+      clientId: this.filterClientId != null ? this.filterClientId : null,
       date: this.filterDate != null ? this.filterDate.format('YYYY-MM-DD') : null
     };
   }
@@ -185,13 +188,13 @@ export class LoanListComponent implements OnInit {
 
 
   onCleanFilter(): void {
-    this.filterClient = null;
-    this.filterGame = null;
+    this.filterClientId = null;
+    this.filterGameId = null;
     this.filterDate = moment();
     this.getLoans({
       pageIndex: 0,
       pageSize: this.pageSize,
-      length: this.totalElements()
+      length: this.totalElements
     });
   }
 
@@ -199,7 +202,7 @@ export class LoanListComponent implements OnInit {
     this.getLoans({
       pageIndex: 0,
       pageSize: this.pageSize,
-      length: this.totalElements()
+      length: this.totalElements
     });
 
   }
@@ -214,20 +217,35 @@ export class LoanListComponent implements OnInit {
   }
 
   createLoan() {
-    const id: number = this.nextId();
-    this.openEditCreateModal(
+    this.loanService.getLastId().subscribe(
+      result=>{
+        const id = result+1;
+
+        if(id>this.nextId){
+          this.nextId = id;
+        }
+        else{
+          this.nextId+=1;
+        }
+
+
+        this.openEditCreateModal(
       {
         object: {
-          id: id,
+          id: this.nextId,
           game: null,
           client: null,
           startDate: '',
           endDate: ''
         },
-        id: id,
+        id: this.nextId,
         editMode: false
       }
     )
+      }
+    )
+
+
   }
 
   private openEditCreateModal(data: editCreateDataModel<Loan>) {
@@ -237,37 +255,73 @@ export class LoanListComponent implements OnInit {
     });
 
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
+      //console.log(result);
+      if(!result){
+        this.nextId-=1;
+      }
+      if(result &&!data.editMode){
+
+        if(this.loansList.data.length==this.pageSize){
+          console.log(this.pageNumber);
+          this.pageNumber+=1;
+          console.log(this.pageNumber);
+        }
+      }
+
       this.ngOnInit();
     });
+
+    // dialogRef.afterClosed().subscribe(result => {
+    //   this.ngOnInit();
+    // });
   }
 
   deleteLoan(loan: Loan) {
-    const dialogRef = this.dialog.open(DialogConfirmationComponent, {
-                data: { title: "Eliminar Prestamo", description: "Atención si borra el préstamo se perderán sus datos.<br> ¿Desea eliminar el préstamo?" }
-              });
+    const endDate = moment(loan.endDate);
+    const startDate = moment(loan.startDate);
 
-              dialogRef.afterClosed().subscribe(result => {
-                if (result) {
-                  this.loanService.delete(loan.id).subscribe(
-                    {
-                      next: () => {
-                        this.ngOnInit();
-                      },
-                      error: (err) => {
-                        switch (err.status) {
-                          case 401: console.error('not valid token'); break;
-                          case 404: console.error('not found category'); break;
-                          case 409: console.error('Cant delete Category in use'); break;
-                          default: console.error('Default');
-                        }
-                      }
-                    }
-                  );
+    if (moment().isBetween(startDate, endDate, 'day') ||moment().isSame(startDate,'day') || moment().isSame(endDate,'day')) {
+      const dialogRef = this.dialog.open(NotDeleteableComponent, {
+        data: {
+          canDelete: false,
+          reason: 'EN PROCESO'
+        }
+      })
+    }
+    else {
+      const dialogRef = this.dialog.open(DialogConfirmationComponent, {
+        data: { title: "Eliminar Prestamo", description: "Atención si borra el préstamo se perderán sus datos.<br> ¿Desea eliminar el préstamo?" }
+      });
+
+      dialogRef.afterClosed().subscribe(result => {
+        if (result) {
+          this.loanService.delete(loan.id).subscribe(
+            {
+              next: () => {
+                this.ngOnInit();
+              },
+              error: (err) => {
+                switch (err.status) {
+                  case 401: console.error('not valid token'); break;
+                  case 404: console.error('not found category'); break;
+                  case 409: console.error('Cant delete Category in use'); break;
+                  default: console.error('Default');
                 }
-              });
-
+              }
+            }
+          );
+        }
+      });
+    }
   }
 
 
+  isNotEditable(loan: Loan) {
+    const endDate = moment(loan.endDate);
+    if (endDate.isBefore(moment(), 'day')) {
+      return true
+    }
+    return false;
+  }
 }

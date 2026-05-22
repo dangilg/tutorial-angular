@@ -74,7 +74,7 @@ export class AuthModalComponent implements OnInit {
         },
         error: (err) => {
           if (err.status === 409) {
-            this.errorMessage = "User Already Exists";
+            this.errorMessage = "El usuario ya existe";
             this.errorVisibility=true;
             //this.errorVisibility.set(true);
             this.cdr.detectChanges();
@@ -98,7 +98,7 @@ export class AuthModalComponent implements OnInit {
         error:(err)=>{
 
           if(err.status===401){
-            this.errorMessage = "Wrong User or Password";
+            this.errorMessage = "Usuario o contraseña erroneos";
 
             this.errorVisibility=true;
 
@@ -108,5 +108,14 @@ export class AuthModalComponent implements OnInit {
         }
       }
     )
+  }
+
+  onSubmit(){
+    if(this.mode===AuthMode.LOGIN){
+      this.logIn();
+    }
+    else{
+      this.signIn();
+    }
   }
 }

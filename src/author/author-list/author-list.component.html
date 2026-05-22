@@ -1,45 +1,59 @@
-<div class="container">
-    <h1>Listado de Autores</h1>
+<div class="page">
 
-    <mat-table [dataSource]="dataSource">
-        <ng-container matColumnDef="id">
+  <div class="page-header">
+    <h1>Listado de Autores</h1>
+  </div>
+
+  <div class="page-container">
+    <div class="table-wrapper">
+      <div class="table-scroll">
+        <mat-table [dataSource]="dataSource">
+          <ng-container matColumnDef="id">
             <mat-header-cell *matHeaderCellDef> Identificador </mat-header-cell>
             <mat-cell *matCellDef="let element"> {{element.id}} </mat-cell>
-        </ng-container>
+          </ng-container>
 
-        <ng-container matColumnDef="name">
-            <mat-header-cell *matHeaderCellDef> Nombre autor  </mat-header-cell>
+          <ng-container matColumnDef="name">
+            <mat-header-cell *matHeaderCellDef> Nombre autor </mat-header-cell>
             <mat-cell *matCellDef="let element"> {{element.name}} </mat-cell>
-        </ng-container>
+          </ng-container>
 
-        <ng-container matColumnDef="nationality">
-            <mat-header-cell *matHeaderCellDef> Nacionalidad  </mat-header-cell>
+          <ng-container matColumnDef="nationality">
+            <mat-header-cell *matHeaderCellDef> Nacionalidad </mat-header-cell>
             <mat-cell *matCellDef="let element"> {{element.nationality}} </mat-cell>
-        </ng-container>
+          </ng-container>
 
-        <ng-container matColumnDef="action">
+          <ng-container matColumnDef="action">
             <mat-header-cell *matHeaderCellDef></mat-header-cell>
             <mat-cell *matCellDef="let element">
               @if(isLoggedIn$|async){
-                <button mat-icon-button color="primary" (click)="editAuthor(element)">
-                    <mat-icon>edit</mat-icon>
-                </button>
-                <button mat-icon-button color="accent" (click)="deleteAuthor(element)">
-                    <mat-icon>clear</mat-icon>
-                </button>
+              <button mat-icon-button color="primary" (click)="editAuthor(element)">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-icon-button color="accent" (click)="deleteAuthor(element)">
+                <mat-icon>clear</mat-icon>
+              </button>
               }
             </mat-cell>
-        </ng-container>
+          </ng-container>
 
-        <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></mat-header-row>
-        <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
-    </mat-table>
+          <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></mat-header-row>
+          <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+        </mat-table>
+      </div>
 
-    <mat-paginator (page)="loadPage($event)" [pageSizeOptions]="[5, 10, 20]" [pageIndex]="pageNumber()" [pageSize]="pageSize" [length]="totalElements()" showFirstLastButtons></mat-paginator>
+      <mat-paginator (page)="loadPage($event)" [pageSizeOptions]="[5, 10, 20]" [pageIndex]="pageNumber()"
+        [pageSize]="pageSize" [length]="totalElements()" showFirstLastButtons>
+      </mat-paginator>
 
-    @if(isLoggedIn$|async){
-    <div class="buttons">
-        <button mat-flat-button color="primary" (click)="createAuthor()">Nuevo autor</button>
     </div>
+  </div>
+  @if(isLoggedIn$|async){
+  <div class="page-footer">
+    <div class="buttons">
+      <button mat-flat-button color="primary" (click)="createAuthor()">Nuevo autor</button>
+    </div>
+  </div>
+
   }
 </div>

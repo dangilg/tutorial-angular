@@ -28,6 +28,8 @@ export class ClientEditComponent implements OnInit {
   editMode: boolean;
   errMsg: string = "a";
   id:number;
+  originalClient:Client;
+
   constructor(
     public dialogRef: MatDialogRef<ClientEditComponent>,
     private clientService: ClientService,
@@ -38,11 +40,17 @@ export class ClientEditComponent implements OnInit {
     //si existe this.data.category -> crear nuevo objeto con los datos del mismo
     //sino, nuevo objeto vacío.
     this.client = this.data.object ? { ...this.data.object } : new Client();
+
+    this.originalClient = {...this.client};
+
     this.id = this.data.id;
     this.editMode = this.data.editMode;
     // this.nameCtrl.control.setErrors({ alreadyExists: false });
   }
 
+  isUnchanged():boolean{
+    return JSON.stringify(this.client) === JSON.stringify(this.originalClient);
+  }
   onSave() {
     if (!this.editMode) {
       this.client.id = null;

@@ -46,6 +46,6 @@
 
     <div class="buttons">
         <button mat-stroked-button (click)="onClose()">Cerrar</button>
-        <button mat-flat-button color="primary" (click)="onSave()" [disabled]="gameEditForm.invalid || gameEditForm.pristine">Guardar</button>
+        <button mat-flat-button color="primary" (click)="onSave()" [disabled]="gameEditForm.invalid || isUnchanged()">Guardar</button>
     </div>
 </div>

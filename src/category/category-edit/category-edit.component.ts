@@ -26,6 +26,8 @@ export class CategoryEditComponent implements OnInit {
     editMode: boolean;
     id:number;
 
+    originalCategory: Category;
+
     constructor(
         public dialogRef: MatDialogRef<CategoryEditComponent>,
         private categoryService: CategoryService,
@@ -36,9 +38,15 @@ export class CategoryEditComponent implements OnInit {
       //si existe this.data.category -> crear nuevo objeto con los datos del mismo
       //sino, nuevo objeto vacío.
         this.category = this.data.object ? {...this.data.object}:new Category();
+        this.originalCategory = {...this.category};
+
         this.id = this.data.id;
         this.editMode =this.data.editMode;
 
+    }
+
+    isUnchanged():boolean{
+      return JSON.stringify(this.category) === JSON.stringify(this.originalCategory);
     }
 
     onSave() {
