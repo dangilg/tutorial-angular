@@ -2,8 +2,9 @@
   <h2>{{mensaje}}</h2>
   <div class="buttons">
     @if(modo==logOutMode.MANUAL){
+
+    <button mat-stroked-button type="button" (click)="close(false)">NO</button>
     <button mat-flat-button color="primary" type="button" (click)="close(true)">SI</button>
-    <button mat-flat-button color="primary" type="button" (click)="close(false)">NO</button>
     }
     @else {
     <button mat-flat-button color="primary" type="button" (click)="close(true)">Cerrar</button>
