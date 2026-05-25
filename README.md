@@ -87,7 +87,8 @@ For more information on using the Angular CLI, including detailed command refere
 
 ### Clientes
 
-- Ninguna modificación extra a las anteriores mencionadas.
+- No se puede **Eliminar** un *Cliente* si tiene un *Préstamo* activo o futuro.
+
 
 ### Catálogo
 
