@@ -2,6 +2,8 @@ import { Component, Inject, OnInit } from "@angular/core";
 import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
 import { DeleteCheckResponse } from "../model/deleteCheckResponse";
 import { MatButtonModule } from '@angular/material/button';
+
+//Componente que gestiona el modal que informa que un Objeto no se puede eliminar
 @Component({
   selector: 'app-not-deleteable',
   imports: [
@@ -30,6 +32,6 @@ export class NotDeleteableComponent implements OnInit{
   }
 
   onClose(){
-    this.dialogRef.close();
+    this.dialogRef.close(false);
   }
 }

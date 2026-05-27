@@ -8,6 +8,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { editCreateDataModel } from '../../core/model/editCreateDataModel';
 
+
+//Componente que gestiona el Modal de edición y creación de una Categoría
 @Component({
     selector: 'app-category-edit',
 
@@ -34,9 +36,8 @@ export class CategoryEditComponent implements OnInit {
         @Inject(MAT_DIALOG_DATA) public data:editCreateDataModel<Category>,
     ) {}
 
+    // Copiamos el objeto Categoría dado, o creamos uno nuevo.
     ngOnInit(): void {
-      //si existe this.data.category -> crear nuevo objeto con los datos del mismo
-      //sino, nuevo objeto vacío.
         this.category = this.data.object ? {...this.data.object}:new Category();
         this.originalCategory = {...this.category};
 
@@ -45,11 +46,15 @@ export class CategoryEditComponent implements OnInit {
 
     }
 
+    // Revisamos si los datos de la Categoria han cambiado respecto al original
     isUnchanged():boolean{
       return JSON.stringify(this.category) === JSON.stringify(this.originalCategory);
     }
 
+
+    //Gestionamos el guardado de la Categoría.
     onSave() {
+      //Si es modo creación, el id es null
         if(!this.editMode){
           this.category.id=null;
         }

@@ -12,6 +12,7 @@ import { ClientEditComponent } from '../client-edit/client-edit.component';
 import { NotDeleteableComponent } from '../../core/notDeleteableComponent/notDeleteable.component';
 import { DialogConfirmationComponent } from '../../core/dialog-confirmation/dialog-confirmation.component';
 
+//Componente que gestiona la lista de Clientes
 @Component({
   selector: 'app-client-list.component',
   imports: [
@@ -39,6 +40,7 @@ export class ClientListComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    //Obtenemos la lista de clientes.
     this.clientService.getClients().subscribe(
       clients => {
         this.dataSource.data = clients;
@@ -65,6 +67,7 @@ export class ClientListComponent implements OnInit {
     )
   }
 
+  //Creación o edición del CLiente
   private openEditCreateModal(data: editCreateDataModel<Client>) {
     const dialogRef = this.dialog.open(ClientEditComponent, {
       data: data
@@ -74,6 +77,8 @@ export class ClientListComponent implements OnInit {
       this.ngOnInit();
     });
   }
+
+
   edit(client: Client) {
     this.openEditCreateModal(
       {
@@ -99,12 +104,18 @@ export class ClientListComponent implements OnInit {
       }
     )
   }
+
+  //Gestionamos el borrado del Cliente.
   delete(client:Client){
+    //Revisamos si el cliente está o no en un préstamos en Activo o Futuro para poder ser borrado.
+    //Si no lo está, se puede borrar.
     this.clientService.isDeleteable(client.id).subscribe(
           result => {
+            //No se puede borrar
             if (!result.canDelete) {
               const dialogRef = this.dialog.open(NotDeleteableComponent, { disableClose: true, data: result });
             }
+            //Se puede borrar
             else {
               const dialogRef = this.dialog.open(DialogConfirmationComponent, {
                 data: { title: "Eliminar cliente", description: "Atención si borra el cliente se perderán sus datos.<br> ¿Desea eliminar el cliente?" }
@@ -120,8 +131,8 @@ export class ClientListComponent implements OnInit {
                       error: (err) => {
                         switch (err.status) {
                           case 401: console.error('not valid token'); break;
-                          case 404: console.error('not found category'); break;
-                          case 409: console.error('Cant delete Category in use'); break;
+                          case 404: console.error('not found Client'); break;
+                          case 409: console.error('Cant delete Client in use'); break;
                           default: console.error('Default');
                         }
                       }

@@ -8,6 +8,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { editCreateDataModel } from '../../core/model/editCreateDataModel';
 
+//Componente de edición y creación de un Cliente
 @Component({
   selector: 'app-category-edit',
 
@@ -22,13 +23,14 @@ import { editCreateDataModel } from '../../core/model/editCreateDataModel';
   styleUrl: './client-edit.component.scss'
 })
 export class ClientEditComponent implements OnInit {
+  //NgModel que modifica el mensaje de error de client.name
   @ViewChild('nameCtrl') nameCtrl!: NgModel;
 
   client: Client;
   editMode: boolean;
   errMsg: string = "a";
-  id:number;
-  originalClient:Client;
+  id: number;
+  originalClient: Client;
 
   constructor(
     public dialogRef: MatDialogRef<ClientEditComponent>,
@@ -37,21 +39,24 @@ export class ClientEditComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    //si existe this.data.category -> crear nuevo objeto con los datos del mismo
-    //sino, nuevo objeto vacío.
+    //Copiamos los valores del Cliente dado, o creamos uno nuevo si este es null
     this.client = this.data.object ? { ...this.data.object } : new Client();
 
-    this.originalClient = {...this.client};
+    this.originalClient = { ...this.client };
 
     this.id = this.data.id;
     this.editMode = this.data.editMode;
-    // this.nameCtrl.control.setErrors({ alreadyExists: false });
   }
 
-  isUnchanged():boolean{
+
+  //Gestinamos si el Cliente es distinto del Original
+  isUnchanged(): boolean {
     return JSON.stringify(this.client) === JSON.stringify(this.originalClient);
   }
+
+  //Gestionamos el guard<do del Cliente en la BD.
   onSave() {
+    //Si es modo creación, el id es null
     if (!this.editMode) {
       this.client.id = null;
     }

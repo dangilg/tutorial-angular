@@ -20,7 +20,8 @@ import { CommonModule } from '@angular/common';
 import { Interval } from '../model/available/Interval';
 import { forkJoin } from 'rxjs';
 
-
+//Componente que gestiona la edición y creación de un Préstamo.
+//Utiliza reactive forms, para aplicar filtros dinámicos.
 @Component({
   selector: 'app-loan-edit',
   imports: [
@@ -38,33 +39,42 @@ import { forkJoin } from 'rxjs';
   templateUrl: './loan-edit.component.html',
   styleUrl: './loan-edit.component.scss'
 })
+
+
 export class LoanEditComponent implements OnInit {
   loan: Loan;
   editMode: boolean;
-
+  //Lista de Interval, de fechas válidas para el filtro de Fecha Inicial
   validStartDates: Interval[] = null;
+  //Lista de Interval, de fechas válidas para el filtro de Fecha Final
   validEndDates: Interval[] = null;
 
+  //Lista de Juegos (filtrados)
   games: Game[];
+  //Lista de Clientes (filtrados)
   clients: Client[];
 
+  //Variable que comprueba si la lista ha cargado, para mostrar todo a la vez tras los cambios.
   isLoaded = signal(false);
 
 
+  //Filtro de Fechas Inicales
   startDateFilter = (date: Moment | null): boolean => {
-
-
-
+    //Fecha no válida si es null
     if (!date) return false;
 
     const day = date.clone().startOf('day');
 
+    //No válida si es anterior a Hoy
     if (date.isBefore(moment(), 'day')) return false;
 
+    //Válida si existe la lista de fechas iniciales válidas o si si su tamaño es 0
     if (!this.validStartDates || this.validStartDates.length === 0) {
       return true
     }
 
+    //Válida si los intervalos de inicio  incumplen la siguiente regla de negocio:
+    //+ Las fechas deben estar entre la fecha de inicio y la fecha de fin
     return this.validStartDates.some(interval => {
       const start = moment(interval.start).startOf('day');
       const end = moment(interval.end).startOf('day');
@@ -73,8 +83,9 @@ export class LoanEditComponent implements OnInit {
     })
   }
 
-  endDateFilter = (date: Moment | null): boolean => {
 
+  //Filtro de fechas de fin
+  endDateFilter = (date: Moment | null): boolean => {
     if (!date) return false;
     const day = date.clone().startOf('day');
 
@@ -102,6 +113,7 @@ export class LoanEditComponent implements OnInit {
   };
 
 
+  //Función que da formato a la fecha en el DatePicker
   dateClass = (date: Moment): string => {
 
     const startDate: Moment = this.form.get('startDate').value;
@@ -124,6 +136,7 @@ export class LoanEditComponent implements OnInit {
   }
 
 
+  //Definicion del Formulario Reactivo
   form = new FormGroup<{
     id: FormControl<string | null>;
     game: FormControl<Game | null>;
@@ -153,6 +166,7 @@ export class LoanEditComponent implements OnInit {
   ngOnInit(): void {
 
 
+    //Detecta cualquier cambio en el formulario
     this.form.valueChanges.subscribe(
       value => {
 
@@ -178,10 +192,12 @@ export class LoanEditComponent implements OnInit {
 
     this.originalValue = this.normalizeValue(this.form.value);
 
+    //Juntamos las 2 peticiones al back en el mismo hilo por concurrencia
     forkJoin({
       games: this.gameService.getGames(),
       clients: this.clientservice.getClients()
     }).subscribe(({ games, clients }) => {
+      //Dados los valores del formulario, se hace una llamada al back para filtrar.
       this.games = games;
       this.clients = clients;
 
@@ -205,12 +221,15 @@ export class LoanEditComponent implements OnInit {
           { emitEvent: false });
       }
 
+      //Se cambia el estado a Loaded true, para que la vista muestre los datos, sin tener que volver a cambiar su valor después
+      //Sirve para eliminar el error NG0100
       this.isLoaded.set(true);
     })
 
 
   }
 
+  //Damos formato a los valores del formulario
   normalizeValue(value: any) {
     return {
       gameId: value.game?.id ?? null,
@@ -220,6 +239,9 @@ export class LoanEditComponent implements OnInit {
     };
   }
 
+
+  //Funión que comrueba si los valores del formulario son iguales a lor originales o son null
+  //Sirve para activar o desactiva el botón Guardar
   isUnchangedOrNotFull(): boolean {
     const current = this.normalizeValue(this.form.value);
     if(current.clientId == null ||
@@ -232,6 +254,7 @@ export class LoanEditComponent implements OnInit {
     return JSON.stringify(current) === JSON.stringify(this.originalValue);
   }
 
+  //Función para guardar el Prestamo
   onSave() {
     const formValue = this.form.value;
     this.loanService.saveLoan({
@@ -248,6 +271,7 @@ export class LoanEditComponent implements OnInit {
     this.dialogRef.close(false);
   }
 
+  //Limpiamos los valores del formulario
   clean() {
     this.form.patchValue({
       game: null,
@@ -260,11 +284,16 @@ export class LoanEditComponent implements OnInit {
 
     this.form.updateValueAndValidity({ emitEvent: true });
   }
+
+  //Función para los cambios detectados
   onFieldChange(formValue: typeof this.form.value) {
 
-    //this.isLoaded.set(false);
 
+
+    //Validamos las fechas del formualrio
     this.validateDates();
+
+    //Obtenemos los datos para Clientes, Juegos y Fechas que cumplan las reglas de negocio desde el back
 
     this.loanService.getAvailables({
       loanId: this.data.editMode ? this.data.id : null,
@@ -280,13 +309,18 @@ export class LoanEditComponent implements OnInit {
           this.validStartDates = data.validStartDates;
           this.validEndDates = data.validEndDates;
 
-          //this.isLoaded.set(true);
+        // Renderizamos le DOM
           this.cdr.detectChanges();
       }
     );
 
 
   }
+
+  //Validación de las fechas del formulario
+  //Las fechas no pueden ser null
+  //Fecha fi  mayor a fecha inicio
+  //Máximo 14 días entre fecha inicio y fecha fin
   validateDates() {
     if (this.startDate && this.endDate) {
       if (this.endDate.isBefore(this.startDate)) {
@@ -302,6 +336,7 @@ export class LoanEditComponent implements OnInit {
     }
   }
 
+  //Comparamos los Juegos y los Cliente por Id en vez de por nombre.
   compareById = (element1: any, element2: any): boolean => {
 
     return element1 && element2 ? element1.id === element2.id : element1 === element2;

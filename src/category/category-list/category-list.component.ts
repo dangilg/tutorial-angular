@@ -13,6 +13,8 @@ import { DialogConfirmationComponent } from '../../core/dialog-confirmation/dial
 import { AuthService } from '../../core/service/auth.service';
 import { NotDeleteableComponent } from '../../core/notDeleteableComponent/notDeleteable.component';
 
+
+//Componente que gestiona la Page con la lista de Categorías.
 @Component({
   selector: 'app-category-list',
   imports: [
@@ -41,6 +43,7 @@ export class CategoryListComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    //Obtenemos todas las Categorías de la BD
     this.categoryService.getCategories().subscribe(
       categories => {
         this.dataSource.data = categories;
@@ -55,7 +58,6 @@ export class CategoryListComponent implements OnInit {
           }
         }
         else{
-          console.log('else');
           if(size!=0){
             this.categoryService.setNextId(this.dataSource.data[size-1].id +1);
           }
@@ -86,12 +88,16 @@ export class CategoryListComponent implements OnInit {
   }
 
 
+  //Gestionamos el borrado de la Categoría
   funDelete(category: Category) {
+    //Primero revisamos si la Categoría no está en uso en un Juego.
     this.categoryService.isDeleteable(category.id).subscribe(
       result => {
+        //No se puede eliminar
         if (!result.canDelete) {
           const dialogRef = this.dialog.open(NotDeleteableComponent, { disableClose: true, data: result });
         }
+        //Se puede eliminar
         else {
           const dialogRef = this.dialog.open(DialogConfirmationComponent, {
             data: { title: "Eliminar categoría", description: "Atención si borra la categoría se perderán sus datos.<br> ¿Desea eliminar la categoría?" }
@@ -122,6 +128,7 @@ export class CategoryListComponent implements OnInit {
 
   }
 
+
   createCategry() {
     const id: number = this.nextId;
     this.openEditCreateModal(
@@ -137,6 +144,8 @@ export class CategoryListComponent implements OnInit {
     )
   }
 
+
+  //Gestionamos la creación o edición de una Categoría
   private openEditCreateModal(data: editCreateDataModel<Category>) {
 
     const dialogRef = this.dialog.open(CategoryEditComponent, {

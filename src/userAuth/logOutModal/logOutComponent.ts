@@ -6,6 +6,9 @@ import { AuthService } from "../../core/service/auth.service";
 import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
 import { LogOutDataModel } from "./model/logOutDataModel";
 import { LogOutMode } from "./model/LogOutMode";
+
+//Componente que gestiona el cierre de sesión de un Usuario
+//Puede ser automático (token no válido) o manual
 @Component({
   selector: 'app-log-out-modal',
   imports: [
@@ -27,6 +30,7 @@ export class LogOutComponent implements OnInit {
     private authService: AuthService,
     @Inject(MAT_DIALOG_DATA) public data: LogOutDataModel,
   ) { }
+
   ngOnInit(): void {
 
     this.modo = this.data?.modo ?? null;

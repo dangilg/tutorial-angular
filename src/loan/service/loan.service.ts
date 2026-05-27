@@ -10,6 +10,7 @@ import { LoanDto } from "../model/LoanDto";
 import { AvailableDto } from "../model/available/AvailableDto";
 import { ResponseAvailableDto } from "../model/available/ResponseAvailableDto";
 
+//Service que gestiona las peticiones de Préstamos
 @Injectable({
   providedIn: 'root',
 })
@@ -25,31 +26,32 @@ export class LoanService {
 
 
 
-
+//Peticiçon que obtiene los Prestamos según los filtros
   getLoans(dto:LoanDto):Observable<PageData<Loan>>{
 
     return this.http.post<PageData<Loan>>(this.baseUrl,dto);
   }
 
+  //Petición que obtiene los datos de dispobibilidad para un préstamos segun sus datos
   getAvailables(dto:AvailableDto):Observable<ResponseAvailableDto>{
-    console.log('estoy en getAvailables');
+
     const url = `${this.baseUrl}/available`;
     return this.http.post<ResponseAvailableDto>(url,dto);
   }
 
+  //Petición para guardar un Préstamos
   saveLoan(dto:AvailableDto):Observable<void>{
     const id = dto.loanId;
     const url = id ? `${this.baseUrl}/save/${id}` : `${this.baseUrl}/save`;
-    console.log('saveLoan');
-    console.log(url);
-    console.log(dto)
     return this.http.put<void>(url,dto);
   }
 
+  //Petición para obtener el último Id
   getLastId():Observable<number>{
     return this.http.get<number>(`${this.baseUrl}/lastId`)
   }
 
+  //Petición para eliminar un prestamo
   delete(id:number):Observable<any>{
     return this.http.delete(`${this.baseUrl}/${id}`);
   }

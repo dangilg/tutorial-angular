@@ -5,48 +5,53 @@ import { Category } from '../model/category';
 import { CATEGORY_DATA } from '../model/mock-categories';
 import { AuthService } from '../../core/service/auth.service';
 import { DeleteCheckResponse } from '../../core/model/deleteCheckResponse';
+
+//Service de gestión de Categorías
 @Injectable({
   providedIn: 'root'
 })
 export class CategoryService {
 
   constructor(
-    private http:HttpClient,
+    private http: HttpClient,
 
   ) { }
 
   private baseUrl = 'http://localhost:8080/category';
 
-  getNextId():number{
+  //Obtenemos el nextId de SessionStorage
+  getNextId(): number {
     const nextIdStr = sessionStorage.getItem('nextCategoryId');
     return Number(nextIdStr);
   }
 
-  setNextId(nextId:number){
-    sessionStorage.setItem('nextCategoryId',nextId.toString());
+  //Guardamos el nextId en SessionStorage
+  setNextId(nextId: number) {
+    sessionStorage.setItem('nextCategoryId', nextId.toString());
   }
 
-
+  //Petición que obtiene toda la lista de Categorías
   getCategories(): Observable<Category[]> {
-    //return of(CATEGORY_DATA);
     return this.http.get<Category[]>(this.baseUrl);
 
   }
 
-
-   saveCategory(category: Category): Observable<Category> {
-    const {id} =category;
-    const url = id? `${this.baseUrl}/${id}`:this.baseUrl;
-    return this.http.put<Category>(url,category);
+  //Petición para guardar una Categoría
+  saveCategory(category: Category): Observable<Category> {
+    const { id } = category;
+    const url = id ? `${this.baseUrl}/${id}` : this.baseUrl;
+    return this.http.put<Category>(url, category);
 
   }
 
-  deleteCategory(idCategory : number): Observable<any> {
-    const url=`${this.baseUrl}/${idCategory}`;
+  //Petición para borrar una Categoría
+  deleteCategory(idCategory: number): Observable<any> {
+    const url = `${this.baseUrl}/${idCategory}`;
     return this.http.delete(url);
   }
 
-  isDeleteable(idCategory: number):Observable<DeleteCheckResponse>{
+  //Petición para comprobar si una Categoría se puede borrar o no
+  isDeleteable(idCategory: number): Observable<DeleteCheckResponse> {
     const url = `${this.baseUrl}/${idCategory}/can-delete`;
     return this.http.get<DeleteCheckResponse>(url);
   }

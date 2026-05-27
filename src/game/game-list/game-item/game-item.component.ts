@@ -2,7 +2,7 @@ import {Component, Input } from '@angular/core';
 import { Game } from '../../model/Game';
 import  {MatCardModule} from '@angular/material/card';
 
-
+//Componente que gestiona un item (Juego) de la lista.
 @Component({
   selector: 'app-game-item',
   imports: [MatCardModule],

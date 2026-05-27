@@ -11,7 +11,7 @@ import { AuthMode } from '../../userAuth/model/AuthMode';
 import { LogOutComponent } from '../../userAuth/logOutModal/logOutComponent';
 import { LogOutMode } from '../../userAuth/logOutModal/model/LogOutMode';
 
-
+//Componente que gestiona la cabecera de la páginca, así como la revisión periódica del token válido.
 @Component({
   selector: 'app-header-component',
   imports: [
@@ -26,7 +26,9 @@ import { LogOutMode } from '../../userAuth/logOutModal/model/LogOutMode';
 export class HeaderComponent implements OnInit {
   title = 'tutorial Angular';
 
+  //Variable global que almacena si el usuario ha iniciaso sesión.
   isLoggedIn$ = this.authService.isLoggedIn$;
+
   constructor(
     public dialog: MatDialog,
     private authService: AuthService
@@ -35,11 +37,11 @@ export class HeaderComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    //console.log('init header')
-
+    //Obtenemos el token y comprobamos si sisgue siendo válido.
     if (this.authService.getToken()) {
       this.authService.isTokenValid().subscribe(
         isValid => {
+          //El token no es válido, cerramos sesión.
           if (!isValid) {
             //se puede modificar con un mensaje
             const dialogRef = this.dialog.open(LogOutComponent, {
@@ -54,6 +56,8 @@ export class HeaderComponent implements OnInit {
       )
     }
   }
+
+  //Abrimos el modal de Registrarse.
   openSignInModal() {
     const dialogRef = this.dialog.open(AuthModalComponent, {
       disableClose: true,
@@ -62,6 +66,7 @@ export class HeaderComponent implements OnInit {
 
   }
 
+  //Abrimos el modal de Iniciar Sesión.
   openLogInModal() {
     const dialogRef = this.dialog.open(AuthModalComponent, {
       disableClose: true,
@@ -71,6 +76,8 @@ export class HeaderComponent implements OnInit {
     })
   }
 
+
+  //Abrimos el modal de Cierre de Sesión.
   logOut() {
     const dialogRef = this.dialog.open(LogOutComponent, {
       data: {

@@ -2,6 +2,7 @@ import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 
+//Componente que gestiona los modales con dialogo de confirmaaión
 @Component({
   selector: 'app-dialog-confirmation',
   imports: [

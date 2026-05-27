@@ -17,7 +17,7 @@ import { GameItemComponent } from './game-item/game-item.component';
 import { AuthService } from '../../core/service/auth.service';
 import { editCreateDataModel } from '../../core/model/editCreateDataModel';
 
-
+//Componente que gestiona la lista de Juegos
 @Component({
   selector: 'app-game-list',
   standalone: true,
@@ -86,12 +86,16 @@ export class GameListComponent implements OnInit {
       .subscribe((categories) => (this.categories = categories));
   }
 
+  //Ponemos los valores de los filtros a null y realizamos la búsqueda de Juegos
   onCleanFilter(): void {
     this.filterTitle = null;
     this.filterCategory = null;
     this.onSearch();
   }
 
+
+  //Dados el valor de los filtros, buscamos los juegos que los cumplan.ç
+  //Si los filtros son null, obtenemos todos los Juegos
   onSearch(): void {
     const title = this.filterTitle;
     const categoryId =
@@ -105,6 +109,7 @@ export class GameListComponent implements OnInit {
   }
 
 
+  //Gestionamos la creación y edición de un Juego
   private openEditCreateModal(data: editCreateDataModel<Game>) {
     const dialogRef = this.dialog.open(GameEditComponent, {
       data: data,
@@ -143,11 +148,14 @@ export class GameListComponent implements OnInit {
     });
   }
 
+  //Cuando cambia el valor del filtro de Categoría, se actualiza la lista de Juegos aplicando este y el resto de filtros
   onCategoryChange(event:any){
     this.filterCategory= event.value;
     this.onSearch();
   }
 
+
+  //Cuando cambia el valor del filtro del Título, se actualiza la lista de Juegos aplicando este y el resto de filtros
   onTittleChange(value:string){
     this.filterTitle=value;
     this.onSearch();

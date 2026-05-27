@@ -13,7 +13,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { editCreateDataModel } from '../../core/model/editCreateDataModel';
 
-
+//Componente que gestiona la edición y creación de un Juego
 @Component({
   selector: 'app-game-edit',
   imports: [
@@ -46,6 +46,7 @@ export class GameEditComponent implements OnInit {
     private authorService: AuthorService
   ) { }
 
+  //Creamos una copia del Game dado, o si no existe, creamos uno nuevo
   ngOnInit(): void {
     this.game = this.data.object ? { ...this.data.object } : new Game();
 
@@ -53,7 +54,7 @@ export class GameEditComponent implements OnInit {
 
     this.editMode = this.data.editMode;
     this.id = this.data.id;
-    //this.game = this.data.game ? Object.assign({}, this.data.game) : new Game();
+
 
     this.categoryService.getCategories().subscribe((categories) => {
       this.categories = categories;
@@ -82,6 +83,7 @@ export class GameEditComponent implements OnInit {
     });
   }
 
+  //Comprobamos si los datos del Juego son los mismos que antes de editarlo.
   isUnchanged():boolean{
     return(
       this.game.title === this.originalGame.title &&
@@ -90,7 +92,10 @@ export class GameEditComponent implements OnInit {
       this.game.author?.id === this.originalGame.author?.id
     );
   }
+
+  //Gestionamos el guardado del Juego
   onSave() {
+    //Si es modo creación, el id es null
     if (!this.editMode) {
       this.game.id = null;
     }

@@ -11,7 +11,7 @@ import { ChangeDetectorRef } from '@angular/core';
 import { AuthService } from '../../core/service/auth.service'
 import { AuthMode } from '../model/AuthMode';
 
-
+//Componente que gestiona el inicio de sesión de un usuario
 
 @Component({
   selector: 'app-sign-in-modal',
@@ -27,6 +27,8 @@ import { AuthMode } from '../model/AuthMode';
   templateUrl: './auth-modal.component.html',
   styleUrl: './auth-modal.component.scss',
 })
+
+
 export class AuthModalComponent implements OnInit {
   user: User;
   hidePassword: boolean = true;
@@ -59,6 +61,7 @@ export class AuthModalComponent implements OnInit {
     this.dialogRef.close();
   }
 
+  //Gestionamos el registro y sus posibles errores
   signIn() {
 
     this.authModalService.sigIn(this.user).subscribe(
@@ -76,7 +79,7 @@ export class AuthModalComponent implements OnInit {
           if (err.status === 409) {
             this.errorMessage = "El usuario ya existe";
             this.errorVisibility=true;
-            //this.errorVisibility.set(true);
+
             this.cdr.detectChanges();
           }
         }
@@ -84,6 +87,7 @@ export class AuthModalComponent implements OnInit {
     );
   }
 
+  //Gestionamos el inicio de sesión y sus posibles errores
   logIn(){
     this.authModalService.logIn(this.user).subscribe(
       {
@@ -91,7 +95,6 @@ export class AuthModalComponent implements OnInit {
 
 
 
-            //console.log(this.errorVisibility);
             this.authService.login(response.token);
             this.dialogRef.close();
         },
@@ -102,7 +105,7 @@ export class AuthModalComponent implements OnInit {
 
             this.errorVisibility=true;
 
-            //console.log(this.errorVisibility);
+
             this.cdr.detectChanges();
           }
         }
@@ -110,6 +113,7 @@ export class AuthModalComponent implements OnInit {
     )
   }
 
+  //Gestionamos el evento Submit
   onSubmit(){
     if(this.mode===AuthMode.LOGIN){
       this.logIn();

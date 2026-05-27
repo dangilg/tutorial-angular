@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 
+//Rutas con LazyLoad de las páginas del Header.
 export const routes: Routes = [
   {
     path:'category',

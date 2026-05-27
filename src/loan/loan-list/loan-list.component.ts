@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, ViewChild } from '@angular/core';
 
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormField, MatFormFieldModule, MatLabel, MatSuffix } from '@angular/material/form-field';
@@ -32,6 +32,9 @@ import { DialogConfirmationComponent } from '../../core/dialog-confirmation/dial
 import { forkJoin } from 'rxjs';
 import { NotDeleteableComponent } from '../../core/notDeleteableComponent/notDeleteable.component';
 
+
+//Componente que gestiona la lista Filtrada y paginada de Préstamos
+
 @Component({
   standalone: true,
   selector: 'app-loan-list',
@@ -62,6 +65,7 @@ export class LoanListComponent implements OnInit {
   filterClientId: number = null;
 
 
+  //Por defecto, la fecha de filtro es la fecha actual. Está la opción de poner su valor a null para obtener el histórico de Préstamos.
   filterDate: Moment = moment();
 
   games: Game[] = [];
@@ -88,6 +92,9 @@ export class LoanListComponent implements OnInit {
 
   nextId: number = -1;
 
+  @ViewChild(MatPaginator) paginator!:MatPaginator
+
+
   constructor(
     private authService: AuthService,
     private loanService: LoanService,
@@ -100,6 +107,7 @@ export class LoanListComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    //Hacemos una petición en el mismo hilo para obtener la lista de Clientes y Juegos para los filtros.
     forkJoin({
       clients: this.clientService.getClients(),
       games: this.gameServie.getGames(),
@@ -110,14 +118,18 @@ export class LoanListComponent implements OnInit {
         this.games = games;
 
 
+        //Obtenemos los préstamos
         this.getLoans();
-        //console.log(this.isLoaded());
+
+        //Definimos que la página está completa, por lo que se puede renderizar el DOM
         this.isLoaded.set(true);
-        //console.log(this.isLoaded());
+
       }
     );
 
   }
+
+  //Función que permite obtener la lista de Préstamos en relación a un evento paginado o a nada.
 
   getLoans(event?: PageEvent) {
     const pageable: Pageable = this.getPageable(event);
@@ -136,6 +148,7 @@ export class LoanListComponent implements OnInit {
           this.isLoaded.set(false);
         }
 
+        //Si la página está vacía y no es la primera, cargamos la anterior.
         if (this.loansList.data.length == 0 && pageable.pageNumber != 0) {
           const evt: PageEvent = {
             pageIndex: pageable.pageNumber - 1,
@@ -157,6 +170,7 @@ export class LoanListComponent implements OnInit {
 
   }
 
+  //Obtenemos los datos de paginación (PageNumber, PageSize, Sort,...)
   getPageable(event?: PageEvent): Pageable {
     const pageable: Pageable = {
       pageNumber: this.pageNumber,
@@ -177,6 +191,8 @@ export class LoanListComponent implements OnInit {
     return pageable;
   }
 
+
+  //Obtenemos los datos de los filtros (valor o null)
   getFilters(): FilterDataModel {
     return {
       gameId: this.filterGameId != null ? this.filterGameId : null,
@@ -187,6 +203,7 @@ export class LoanListComponent implements OnInit {
 
 
 
+  //Limpiamos los filtros y obtenemos la lista de loans por defecto
   onCleanFilter(): void {
     this.filterClientId = null;
     this.filterGameId = null;
@@ -198,6 +215,7 @@ export class LoanListComponent implements OnInit {
     });
   }
 
+  //Funión que aplica una búsqueda con los filtros.
   onSearch(): void {
     this.getLoans({
       pageIndex: 0,
@@ -206,6 +224,8 @@ export class LoanListComponent implements OnInit {
     });
 
   }
+
+
   editLoan(loan: Loan) {
     this.openEditCreateModal(
       {
@@ -248,6 +268,7 @@ export class LoanListComponent implements OnInit {
 
   }
 
+  //Función que gestiona la creación y edición de un Préstamos abriendo su componente.
   private openEditCreateModal(data: editCreateDataModel<Loan>) {
 
     const dialogRef = this.dialog.open(LoanEditComponent, {
@@ -271,16 +292,14 @@ export class LoanListComponent implements OnInit {
 
       this.ngOnInit();
     });
-
-    // dialogRef.afterClosed().subscribe(result => {
-    //   this.ngOnInit();
-    // });
   }
 
+  //Función que gestiona el borrado de un Préstamo
   deleteLoan(loan: Loan) {
     const endDate = moment(loan.endDate);
     const startDate = moment(loan.startDate);
 
+    //No se pueden borrar Préstamos en proceso (fecha actual entre su fecha de inicio  fecha de fin)
     if (moment().isBetween(startDate, endDate, 'day') ||moment().isSame(startDate,'day') || moment().isSame(endDate,'day')) {
       const dialogRef = this.dialog.open(NotDeleteableComponent, {
         data: {
@@ -290,6 +309,7 @@ export class LoanListComponent implements OnInit {
       })
     }
     else {
+      //En caso de poder borrarse, se pide confirmación al usuario
       const dialogRef = this.dialog.open(DialogConfirmationComponent, {
         data: { title: "Eliminar Prestamo", description: "Atención si borra el préstamo se perderán sus datos.<br> ¿Desea eliminar el préstamo?" }
       });
@@ -317,6 +337,8 @@ export class LoanListComponent implements OnInit {
   }
 
 
+  //Gestionaos si un Préstamos se puede editar.
+  //No se puede editar si ha finalizado, es decir, la fecha actual es posterior a la fecha de fin
   isNotEditable(loan: Loan) {
     const endDate = moment(loan.endDate);
     if (endDate.isBefore(moment(), 'day')) {
