@@ -25,12 +25,12 @@ import { NotDeleteableComponent } from '../../core/notDeleteableComponent/notDel
 })
 export class AuthorListComponent implements OnInit {
   NEXTID = 'author_Next_Id';
-  pageNumber=signal(0);
+  pageNumber = signal(0);
   pageSize: number = 5;
 
-  totalElements=signal(0);
+  totalElements = signal(0);
 
-  nextId=signal<number>(Number(sessionStorage.getItem(this.NEXTID))||-1);
+  nextId = signal<number>(Number(sessionStorage.getItem(this.NEXTID)) || -1);
 
   dataSource = new MatTableDataSource<Author>();
   displayedColumns: string[] = ['id', 'name', 'nationality', 'action'];
@@ -48,10 +48,10 @@ export class AuthorListComponent implements OnInit {
     public dialog: MatDialog,
     private authService: AuthService
   ) {
-    effect(()=>{
-    sessionStorage.setItem(this.NEXTID,this.nextId().toString());
+    effect(() => {
+      sessionStorage.setItem(this.NEXTID, this.nextId().toString());
     }
-  );
+    );
   }
 
   ngOnInit(): void {
@@ -86,23 +86,23 @@ export class AuthorListComponent implements OnInit {
       this.dataSource.data = data.content;
 
       //Si el tamaño es 0 y no es la primera página, vamos a la anterior.
-      if(this.dataSource.data.length==0&&pageable.pageNumber!=0){
-        const evt:PageEvent={
-          pageIndex:pageable.pageNumber-1,
-          previousPageIndex:pageable.pageNumber,
-          pageSize:pageable.pageSize,
-          length:data.totalElements
+      if (this.dataSource.data.length == 0 && pageable.pageNumber != 0) {
+        const evt: PageEvent = {
+          pageIndex: pageable.pageNumber - 1,
+          previousPageIndex: pageable.pageNumber,
+          pageSize: pageable.pageSize,
+          length: data.totalElements
         }
         this.loadPage(evt);
       }
-      else{
+      else {
         this.pageNumber.set(data.pageable.pageNumber);
         this.pageSize = data.pageable.pageSize;
         this.totalElements.set(data.totalElements);
       }
 
-      if(this.nextId()<data.totalElements){
-        this.nextId.set(data.totalElements+1);
+      if (this.nextId() < data.totalElements) {
+        this.nextId.set(data.totalElements + 1);
       }
     });
   }
@@ -116,7 +116,7 @@ export class AuthorListComponent implements OnInit {
           name: '',
           nationality: ''
         },
-        id:id,
+        id: id,
         editMode: false
       }
     )
@@ -126,7 +126,7 @@ export class AuthorListComponent implements OnInit {
     this.openEditCreateModal(
       {
         object: author,
-        id:author.id,
+        id: author.id,
         editMode: true
       }
     )
@@ -141,12 +141,12 @@ export class AuthorListComponent implements OnInit {
     dialogRef.afterClosed().subscribe((result) => {
 
       //Actualizamos el nextId para UX
-      if(result &&!data.editMode){
-        this.nextId.update(valor=>valor+1);
+      if (result && !data.editMode) {
+        this.nextId.update(valor => valor + 1);
 
         //si ha sido una creación correcta, y el tamaño de la Page ya era el máximo, vamos a la siguiente Page
-        if(this.dataSource.data.length==this.pageSize){
-          this.pageNumber.update(valor=>valor+1);
+        if (this.dataSource.data.length == this.pageSize) {
+          this.pageNumber.update(valor => valor + 1);
         }
       }
 
@@ -157,53 +157,63 @@ export class AuthorListComponent implements OnInit {
 
   // Gestionamos la eliminación correcta o incorrrecta de un Autor
   deleteAuthor(author: Author) {
-
     // Revisamos si el Autor no está siendo usado en ningún Juego.
     this.authorService.isDeleteable(author.id).subscribe(
-      result => {
-        //No se puede eliminar
-        if (!result.canDelete) {
-          const dialogRef = this.dialog.open(NotDeleteableComponent, {
-            disableClose: true,
-            data: result
-          });
-        }
+      {
+        next: (result) => {
+          //No se puede eliminar
+          if (!result.canDelete) {
+            const dialogRef = this.dialog.open(NotDeleteableComponent, {
+              disableClose: true,
+              data: result
+            });
+          }
 
-        //Se puede eliminar.
-        else {
-          const dialogRef = this.dialog.open(DialogConfirmationComponent, {
-            data: {
-              title: 'Eliminar autor',
-              description:
-                'Atención si borra el autor se perderán sus datos.<br> ¿Desea eliminar el autor?',
-            },
-          });
+          //Se puede eliminar.
+          else {
+            const dialogRef = this.dialog.open(DialogConfirmationComponent, {
+              data: {
+                title: 'Eliminar autor',
+                description:
+                  'Atención si borra el autor se perderán sus datos.<br> ¿Desea eliminar el autor?',
+              },
+            });
 
-          //revisamos si tras mostrar mensaje de borrado, se ha confirmado o no.
-          dialogRef.afterClosed().subscribe((result:boolean) => {
-            //Se confirma borrado, gestionamos el borrado con el backend.
-            if (result) {
-              this.authorService.deleteAuthor(author.id).subscribe(
-                {
-                  next: () => {
-                    this.ngOnInit();
-                  }
-                  ,
-                  error: (err) => {
-                    switch (err.status) {
-                      case 401: console.error('not valid token');break;
-                      case 404: console.error('not found author');break;
-                      case 409: console.error('cant delete Author in use');break;
-                      default:console.error('Default');
+            //revisamos si tras mostrar mensaje de borrado, se ha confirmado o no.
+            dialogRef.afterClosed().subscribe((result: boolean) => {
+              //Se confirma borrado, gestionamos el borrado con el backend.
+              if (result) {
+                this.authorService.deleteAuthor(author.id).subscribe(
+                  {
+                    next: () => {
+                      this.ngOnInit();
+                    }
+                    ,
+                    error: (err) => {
+                      switch (err.status) {
+                        case 401: console.error('not valid token'); break;
+                        case 404: console.error('not found author'); break;
+                        case 409: console.error('cant delete Author in use'); break;
+                        default: console.error('Default');
+                      }
                     }
                   }
-                }
-              );
-            }
-          });
+                );
+              }
+            });
+          }
+        }
+        ,
+        error: (err) => {
+          switch (err.status) {
+            case 404: console.error('not found author'); break;
+            default: console.error('Default');
+          }
         }
       }
     )
+
+
 
 
   }

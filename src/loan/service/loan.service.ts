@@ -9,6 +9,7 @@ import { Loan } from "../model/Loan";
 import { LoanDto } from "../model/LoanDto";
 import { AvailableDto } from "../model/available/AvailableDto";
 import { ResponseAvailableDto } from "../model/available/ResponseAvailableDto";
+import { DeleteCheckResponse } from "../../core/model/deleteCheckResponse";
 
 //Service que gestiona las peticiones de Préstamos
 @Injectable({
@@ -54,5 +55,9 @@ export class LoanService {
   //Petición para eliminar un prestamo
   delete(id:number):Observable<any>{
     return this.http.delete(`${this.baseUrl}/${id}`);
+  }
+
+  isDeleteable(id:number):Observable<DeleteCheckResponse>{
+    return this.http.get<DeleteCheckResponse>(`${this.baseUrl}/${id}/can-delete`)
   }
 }

@@ -92,7 +92,7 @@ export class LoanListComponent implements OnInit {
 
   nextId: number = -1;
 
-  @ViewChild(MatPaginator) paginator!:MatPaginator
+  @ViewChild(MatPaginator) paginator!: MatPaginator
 
 
   constructor(
@@ -113,7 +113,7 @@ export class LoanListComponent implements OnInit {
       games: this.gameServie.getGames(),
 
     }).subscribe(
-      ({ clients, games}) => {
+      ({ clients, games }) => {
         this.clients = clients;
         this.games = games;
 
@@ -144,7 +144,7 @@ export class LoanListComponent implements OnInit {
         this.loansList.data = data.content;
 
         //para evitar el error de renderizado q ocurre cuando data.content está vacío
-        if(this.loansList.data.length==0){
+        if (this.loansList.data.length == 0) {
           this.isLoaded.set(false);
         }
 
@@ -238,30 +238,30 @@ export class LoanListComponent implements OnInit {
 
   createLoan() {
     this.loanService.getLastId().subscribe(
-      result=>{
-        const id = result+1;
+      result => {
+        const id = result + 1;
 
-        if(id>this.nextId){
+        if (id > this.nextId) {
           this.nextId = id;
         }
-        else{
-          this.nextId+=1;
+        else {
+          this.nextId += 1;
         }
 
 
         this.openEditCreateModal(
-      {
-        object: {
-          id: this.nextId,
-          game: null,
-          client: null,
-          startDate: '',
-          endDate: ''
-        },
-        id: this.nextId,
-        editMode: false
-      }
-    )
+          {
+            object: {
+              id: this.nextId,
+              game: null,
+              client: null,
+              startDate: '',
+              endDate: ''
+            },
+            id: this.nextId,
+            editMode: false
+          }
+        )
       }
     )
 
@@ -278,14 +278,14 @@ export class LoanListComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((result) => {
       //console.log(result);
-      if(!result){
-        this.nextId-=1;
+      if (!result) {
+        this.nextId -= 1;
       }
-      if(result &&!data.editMode){
+      if (result && !data.editMode) {
 
-        if(this.loansList.data.length==this.pageSize){
+        if (this.loansList.data.length == this.pageSize) {
           console.log(this.pageNumber);
-          this.pageNumber+=1;
+          this.pageNumber += 1;
           console.log(this.pageNumber);
         }
       }
@@ -296,11 +296,59 @@ export class LoanListComponent implements OnInit {
 
   //Función que gestiona el borrado de un Préstamo
   deleteLoan(loan: Loan) {
+
     const endDate = moment(loan.endDate);
     const startDate = moment(loan.startDate);
 
+    this.loanService.isDeleteable(loan.id).subscribe(
+      {
+        next: (result) => {
+          if (!result.canDelete) {
+            console.log('cantdelete')
+            const dialogRef = this.dialog.open(NotDeleteableComponent, {
+              disableClose: true,
+              data: result
+            });
+          }
+
+          else {
+            const dialogRef = this.dialog.open(DialogConfirmationComponent, {
+              data: { title: "Eliminar Prestamo", description: "Atención si borra el préstamo se perderán sus datos.<br> ¿Desea eliminar el préstamo?" }
+            });
+
+            dialogRef.afterClosed().subscribe(result => {
+              if (result) {
+                this.loanService.delete(loan.id).subscribe(
+                  {
+                    next: () => {
+                      this.ngOnInit();
+                    },
+                    error: (err) => {
+                      switch (err.status) {
+                        case 401: console.error('not valid token'); break;
+                        case 404: console.error('not found category'); break;
+                        case 409: console.error('Cant delete Category in use'); break;
+                        default: console.error('Default');
+                      }
+                    }
+                  }
+                );
+              }
+            });
+          }
+        }
+        ,
+        error:(err)=>{
+          switch(err.status){
+            case 404: console.error('not found loan');break;
+            default: console.error('Default');
+          }
+        }
+      }
+    );
+    /*
     //No se pueden borrar Préstamos en proceso (fecha actual entre su fecha de inicio  fecha de fin)
-    if (moment().isBetween(startDate, endDate, 'day') ||moment().isSame(startDate,'day') || moment().isSame(endDate,'day')) {
+    if (moment().isBetween(startDate, endDate, 'day') || moment().isSame(startDate, 'day') || moment().isSame(endDate, 'day')) {
       const dialogRef = this.dialog.open(NotDeleteableComponent, {
         data: {
           canDelete: false,
@@ -314,26 +362,8 @@ export class LoanListComponent implements OnInit {
         data: { title: "Eliminar Prestamo", description: "Atención si borra el préstamo se perderán sus datos.<br> ¿Desea eliminar el préstamo?" }
       });
 
-      dialogRef.afterClosed().subscribe(result => {
-        if (result) {
-          this.loanService.delete(loan.id).subscribe(
-            {
-              next: () => {
-                this.ngOnInit();
-              },
-              error: (err) => {
-                switch (err.status) {
-                  case 401: console.error('not valid token'); break;
-                  case 404: console.error('not found category'); break;
-                  case 409: console.error('Cant delete Category in use'); break;
-                  default: console.error('Default');
-                }
-              }
-            }
-          );
-        }
-      });
-    }
+
+    }*/
   }
 
 
